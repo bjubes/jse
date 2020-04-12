@@ -111,6 +111,8 @@ def add_func(obj,key,value):
 
 def edit_func(obj,key,value):
     try:
+        if key not in obj:
+            print_err("'{}' doesn't exist. you can add it with --add".format(key,obj))
         obj[key] = value
     except TypeError:
         obj[int(key)] = value

@@ -1,14 +1,14 @@
-# jse - JSON editor
+# jse - JSON editor [![Build Status](https://travis-ci.org/bjubes/jse.svg?branch=master)](https://travis-ci.org/bjubes/jse)
+
 
 quickly edit JSON files from the command line
 
-[![Build Status](https://travis-ci.org/bjubes/jse.svg?branch=master)](https://travis-ci.org/bjubes/jse)
 
 ## Usage
 ```
 $ jse <file> <mode> <key> <value>
 ```
-### Examples
+### Quick Use
 edit an existing key: ``` -e --edit```
 ```
 $ jse config.json --edit app.version 0.3.3
@@ -21,3 +21,4 @@ delete a value: ``` -d --delete```
 ```
 $ jse problems.json --delete problems[99]
 ```
+### Examples
