@@ -62,17 +62,22 @@ def operate_on_key(json,key,value,func,create_keys=True):
             obj = obj[k]
         except TypeError:
             obj = obj[int(k)]
+
     func(obj,query[-1],value)
     return json
 
 def add_func(obj,key,value):
     try:
-        if isinstance(obj[key],list):
+        if isinstance(obj[key],list) and len(obj[key]) is not 0:
+            # object is not a list, but value is
+            # add dummy entry to overwrite later
             length = len(obj[key])
             obj[key].append(None)
             obj = obj[key]
             key = length
         else:
+            # neither object  nor value are lists,
+            # so just make a dummy entry
             obj[key] = None
 
     # obj is a list
