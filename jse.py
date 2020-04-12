@@ -10,6 +10,7 @@ def main():
     group.add_argument("-e","--edit", nargs='*', help="change the value of the json element")
     group.add_argument("-d","--delete", nargs='*', help="remove the json element")
     group.add_argument("-a","--add", nargs='*', help="add a json element")
+    parser.add_argument("--preview",action="store_true",help="preview file changes without saving to disk")
     args = parser.parse_args()
 
     if args.delete:
@@ -37,6 +38,9 @@ def parse_query(args,fn_args,name,func,create_keys):
     value = typed_value(value)
     obj = load_json(args.file)
     obj = operate_on_key(obj,query,value,func,create_keys=create_keys)
+    if args.preview:
+        print(obj)
+        return
     save_json(args.file,obj)
 
 
@@ -53,7 +57,7 @@ def operate_on_key(json,key,value,func,create_keys=True):
     try:
         obj,query = query_object(json,key)
     except KeyError:
-        if not isinstance(json[key],list) or not create_keys:
+        if create_keys or not isinstance(json[key],list) :
             json[key] = value
             obj,query = query_object(json,key)
 
