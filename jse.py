@@ -55,7 +55,8 @@ def operate_on_key(json,key,value,func,create_keys=True):
         if not create_keys and key not in json:
             print_err("Key '{}' does not exist".format(key))
             return json
-        json[key] = value
+        if not isinstance(json[key],list) or not create_keys:
+            json[key] = value
     obj = json
     for k in query[:-1]:
         try:
@@ -68,7 +69,7 @@ def operate_on_key(json,key,value,func,create_keys=True):
 
 def add_func(obj,key,value):
     try:
-        if isinstance(obj[key],list) and len(obj[key]) is not 0:
+        if isinstance(obj[key],list):
             # object is not a list, but value is
             # add dummy entry to overwrite later
             length = len(obj[key])
@@ -102,8 +103,12 @@ def delete_func(obj,key,*ignored):
     try:
         del obj[key]
     except:
-        del obj[int(key)]
-
+        try:
+            del obj[int(key)]
+        except IndexError:
+            if int(key) == 0:
+                print_err("the list is already empty")
+            print_err("There is no element with index",int(key))
 
 def typed_value(v):
     if v.isdigit():
@@ -157,6 +162,7 @@ def split_on_root(string, delim, openers="[{", closers="}]"):
 
 def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
+    exit(1)
 
 if __name__ == "__main__":
     main()
