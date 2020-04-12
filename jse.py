@@ -8,8 +8,8 @@ def main():
     parser.add_argument("file", help="the JSON file to use")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-e","--edit", nargs='*', help="change the value of the json element")
-    group.add_argument("-d","--delete", nargs='*', help="remove the json element")
     group.add_argument("-a","--add", nargs='*', help="add a json element")
+    group.add_argument("-d","--delete", nargs='*', help="remove the json element")
     parser.add_argument("--preview",action="store_true",help="preview file changes without saving to disk")
     args = parser.parse_args()
 
@@ -19,13 +19,14 @@ def main():
             json = operate_on_key(json,key,None,delete_func)
         save_json(args.file,json) 
     elif args.add:
-        parse_query(args,args.add,"add",add_func,create_keys=True)
+        parse_query(args,args.add,"add",add_func)
     elif args.edit:
-        parse_query(args,args.edit,"edit",edit_func,create_keys=False)
+        parse_query(args,args.edit,"edit",edit_func)
     else:
         print_err("must select an operation. use --help to see options")
 
-def parse_query(args,fn_args,name,func,create_keys):
+# parses cmd line args and loads and alters the json object
+def parse_query(args,fn_args,name,func):
     if len(fn_args) < 2:
         print_err(name,"takes a key and a value")
         return
@@ -37,7 +38,7 @@ def parse_query(args,fn_args,name,func,create_keys):
        value = "{{{}}}".format(value)
     value = typed_value(value)
     obj = load_json(args.file)
-    obj = operate_on_key(obj,query,value,func,create_keys=create_keys)
+    obj = operate_on_key(obj,query,value,func)
     if args.preview:
         print(obj)
         return
@@ -53,22 +54,19 @@ def save_json(filename, json_obj):
     with open(filename,'w') as f:
         json.dump(json_obj,f,indent=4)
           
-def operate_on_key(json,key,value,func,create_keys=True):
+def operate_on_key(json,query,value,func):
     try:
-        obj,query = query_object(json,key)
+        obj,key = query_object(json,query)
     except KeyError:
-        if create_keys or not isinstance(json[key],list) :
-            json[key] = value
-            obj,query = query_object(json,key)
+       print("key error in query_object")
 
-    func(obj,query,value)
+    # do the requested operation based on mode (add,edit,delete)
+    func(obj,key,value)
     return json
 
+# use the query to find the sub object we have to modify
 def query_object(json,query):
     query = query.replace("]","").replace("[", ".").split(".")
-    if len(query) == 1:
-        if query[0] not in json:
-            raise KeyError("Key '{}' does not exist".format(query[0]))
     obj = json
     for k in query[:-1]:
         try:
@@ -79,39 +77,26 @@ def query_object(json,query):
 
 def add_func(obj,key,value):
     try:
-        if isinstance(obj[key],list):
-            # object is not a list, but value is
-            # add dummy entry to overwrite later
-            length = len(obj[key])
-            obj[key].append(None)
-            obj = obj[key]
-            key = length
-        elif isinstance(obj[key],dict):
-            # add our entry to the existing dictionary
-            obj[key].update(value)
-
-        else:
-            # entry exists, but is not a list,
-            # so you must call edit to change this
-            print_err("'{}' already exists. Use --edit to change its value".format(key))
-
-    # obj is a list
-    except TypeError:
-        length = len(obj)
-        if length > int(key):
-            print_err("index {} already exists".format(key))
+        obj[key]
+        #this object already exists, but if its a list lets auto append
+        if type(obj[key]) == list:
+            obj[key].append(value)
             return
-        if int(key) is not length:
-            print_err("The list element must be at index",length)
-            return
-        obj.append(None)
+        #its not a list, so we are editing an existing value
+        print_err("'{}' already exists. Use --edit to change its value".format(key))
     except KeyError:
-        obj[key] = None
-    edit_func(obj,key,value)
+        # the key doesn't exist. this means add is valid
+        obj[key] = value
+    except TypeError:
+        # this is a list
+        if int(key) == len(obj):
+            obj.append(value)
 
 def edit_func(obj,key,value):
     try:
         if key not in obj:
+            if isinstance(obj) == list:
+                raise TypeError
             print_err("'{}' doesn't exist. you can add it with --add".format(key,obj))
         obj[key] = value
     except TypeError:
