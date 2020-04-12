@@ -131,12 +131,12 @@ def typed_value(v):
         return [typed_value(e) for e in elems]
 
     if v[0] is '{' and v[-1] is '}':
-        obj = {}
         if len(v.replace(" ","")) ==2:
             return {}
+        obj = {}
         elems = split_on_root(v[1:-1],',')
-        for e in elems:
-            key,value = e.split(":",1)
+        for elem in elems:
+            key,value = elem.split(":",1)
             obj[key] = typed_value(value)
         return obj
         
