@@ -88,12 +88,12 @@ def add_func(obj,key,value):
             key = length
         elif isinstance(obj[key],dict):
             # add our entry to the existing dictionary
-            value.update(obj[key])
+            obj[key].update(value)
 
         else:
-            # neither object  nor value are lists,
-            # so just make a dummy entry
-            obj[key] = None
+            # entry exists, but is not a list,
+            # so you must call edit to change this
+            print_err("'{}' already exists. Use --edit to change its value".format(key))
 
     # obj is a list
     except TypeError:
@@ -105,6 +105,8 @@ def add_func(obj,key,value):
             print_err("The list element must be at index",length)
             return
         obj.append(None)
+    except KeyError:
+        obj[key] = None
     edit_func(obj,key,value)
 
 def edit_func(obj,key,value):
