@@ -50,22 +50,28 @@ def save_json(filename, json_obj):
         json.dump(json_obj,f,indent=4)
           
 def operate_on_key(json,key,value,func,create_keys=True):
-    query = key.replace("]","").replace("[", ".").split(".")
-    if len(query) == 1:
-        if not create_keys and key not in json:
-            print_err("Key '{}' does not exist".format(key))
-            return json
+    try:
+        obj,query = query_object(json,key)
+    except KeyError:
         if not isinstance(json[key],list) or not create_keys:
             json[key] = value
+            obj,query = query_object(json,key)
+
+    func(obj,query,value)
+    return json
+
+def query_object(json,query):
+    query = query.replace("]","").replace("[", ".").split(".")
+    if len(query) == 1:
+        if query[0] not in json:
+            raise KeyError("Key '{}' does not exist".format(query[0]))
     obj = json
     for k in query[:-1]:
         try:
             obj = obj[k]
         except TypeError:
             obj = obj[int(k)]
-
-    func(obj,query[-1],value)
-    return json
+    return obj, query[-1]
 
 def add_func(obj,key,value):
     try:
