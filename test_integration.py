@@ -5,9 +5,7 @@ def test_basic_edit():
     json_obj = {'a':'b'}
     query = 'a'
     value = 'x'
-    func = edit_func
-    create_keys = False
-    
+    func = edit_func    
     obj = operate_on_key(json_obj,query,value,func)
     assert obj == {'a':'x'}
 
@@ -15,9 +13,7 @@ def test_basic_add():
     json_obj = {'a':'b'}
     query = 'c'
     value = 'x'
-    func = add_func
-    create_keys = True
-    
+    func = add_func    
     obj = operate_on_key(json_obj,query,value,func)
     assert obj == {'a':'b','c':'x'}
 
@@ -26,7 +22,6 @@ def test_list_add_auto_index():
     json_obj = {listname:[]}
     value = 'x'
     func = add_func
-    create_keys = True
     obj = operate_on_key(json_obj,listname,value,func)
     assert obj == {listname:[value]}
 
@@ -37,7 +32,6 @@ def test_list_add_manual_index():
     query = listname + ".0"
     value = 'x'
     func = add_func
-    create_keys = True
     obj = operate_on_key(json_obj,query,value,func)
     assert obj == {listname:[value]}
 
@@ -48,10 +42,30 @@ def test_obj_add():
     query = "my_obj.name"
     value = "waldo"
     func = add_func
-    create_keys = True
     obj = operate_on_key(json_obj,query,value,func)
     assert obj == {
         "my_obj" : {
             "name":"waldo"
         }
+    }
+
+def test_obj_add_example():
+    json_obj = {}
+    query = "highscore"
+    value = "[{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}},{}]"
+    value = typed_value(value)
+    func = add_func
+    obj = operate_on_key(json_obj,query,value,func)
+   
+    assert obj == {
+        "highscore": [
+            {
+                "score":32.5,
+                "user": "bob",
+                "metadata": {
+                    "ip":"192.168.1.102",
+                    "client":"firefox"
+                }
+            },{}
+        ]
     }

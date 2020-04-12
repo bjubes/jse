@@ -39,6 +39,18 @@ def test_many_objects():
     assert d["x"] == {"a":"b"}
     assert d["y"] == {"c":"d"}
 
+    d = typed_value("[{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}},{}]")
+    assert len(d) == 2
+    assert d[1] == {}
+    assert d[0] == {
+                "score":32.5,
+                "user": "bob",
+                "metadata": {
+                    "ip":"192.168.1.102",
+                    "client":"firefox"
+                }
+            }
+
 
 def test_split_on_root_basic():
     strs = ["a:b,c:d","1,235,2346fds,90 j,dfs","*,234>,29,0"]
@@ -46,7 +58,6 @@ def test_split_on_root_basic():
         assert split_on_root(s,",") == s.split(",")
     
     assert split_on_root(strs[0],":") == strs[0].split(":")
-
 
 def test_split_on_root_not_nested():
     cases = {
@@ -63,6 +74,7 @@ def test_split_on_root_nested():
     cases = {
         "a:b,c:{d,[e,f,g],n}":["a:b","c:{d,[e,f,g],n}"],
         "a:{d,[c]},b:{as,de,{a,b,c,[1,2]}},a:[{},{{{}}}]": ["a:{d,[c]}","b:{as,de,{a,b,c,[1,2]}}","a:[{},{{{}}}]"],
+        "{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}},{}": ["{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}}","{}"]
     }
 
     for inp,out in cases.items():
