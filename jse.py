@@ -82,6 +82,10 @@ def add_func(obj,key,value):
             obj[key].append(None)
             obj = obj[key]
             key = length
+        elif isinstance(obj[key],dict):
+            # add our entry to the existing dictionary
+            value.update(obj[key])
+
         else:
             # neither object  nor value are lists,
             # so just make a dummy entry
