@@ -18,17 +18,17 @@ def main():
             json = operate_on_key(json,key,None,delete_func)
         save_json(args.file,json) 
     elif args.add:
-        parse_key_value(args,args.add,"add",add_func,create_keys=True)
+        parse_query(args,args.add,"add",add_func,create_keys=True)
     elif args.edit:
-        parse_key_value(args,args.edit,"edit",edit_func,create_keys=False)
+        parse_query(args,args.edit,"edit",edit_func,create_keys=False)
     else:
         print_err("must select an operation. use --help to see options")
 
-def parse_key_value(args,fn_args,name,func,create_keys):
+def parse_query(args,fn_args,name,func,create_keys):
     if len(fn_args) < 2:
         print_err(name,"takes a key and a value")
         return
-    key = fn_args[0]
+    query = fn_args[0]
     value = fn_args[1]
     if len(fn_args) is not 2:
         # this happens when you pass an obj as {} directly in bash
@@ -36,7 +36,7 @@ def parse_key_value(args,fn_args,name,func,create_keys):
        value = "{{{}}}".format(value)
     value = typed_value(value)
     obj = load_json(args.file)
-    obj = operate_on_key(obj,key,value,func,create_keys=create_keys)
+    obj = operate_on_key(obj,query,value,func,create_keys=create_keys)
     save_json(args.file,obj)
 
 
@@ -154,17 +154,17 @@ def typed_value(v):
 
 # splits a string using delim, but ignores it inside brackets and braces
 def split_on_root(string, delim, openers="[{", closers="}]"):
-    ptr = 0
     elems = []
-    stack = []
+    ptr = 0
+    depth = 0
     for i,c in enumerate(string):
-        if c == delim and len(stack) == 0:
+        if c == delim and depth == 0:
             elems.append(string[ptr:i])
             ptr = i+1
         if c in openers:
-            stack.append(c)
+            depth += 1
         if c in closers:
-            stack.pop()
+            depth -= 1
     if ptr != len(string):
         elems.append(string[ptr:])
     return elems
