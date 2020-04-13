@@ -33,15 +33,18 @@ def parse_query(args,fn_args,name,func):
     query = fn_args[0]
     value = fn_args[1]
     if len(fn_args) is not 2:
-        if all(arg[0] == "[" and arg[-1] == "]" for arg in fn_args[1:]):
-            #the user has passed [value] and bash has messed with it.
-            print(fn_args[1:])
-            value = fix_bash_brackets(fn_args[1:])
-        else:
-            # the user passed {value} and bash has messed with it
-            value = ",".join(fn_args[1:])          
-            value = "{{{}}}".format(value)
-            value = typed_value(value)
+        try:
+            if all(arg[0] == "[" and arg[-1] == "]" for arg in fn_args[1:]):
+                #the user has passed [value] and bash has messed with it.
+                print(fn_args[1:])
+                value = fix_bash_brackets(fn_args[1:])
+            else:
+                # the user passed {value} and bash has messed with it
+                value = ",".join(fn_args[1:])          
+                value = "{{{}}}".format(value)
+                value = typed_value(value)
+        except:
+            print_err("either you passed too many arguments or bash has preprocessed and mangled your input. Try putting your value in quotes.")
     else:
         value = typed_value(value)
     obj = load_json(args.file)
