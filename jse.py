@@ -46,7 +46,6 @@ def parse_query(args,fn_args,name,func):
     obj = load_json(args.file)
     obj = operate_on_key(obj,query,value,func)
     if args.preview:
-        print(obj)
         return
     save_json(args.file,obj)
 
@@ -63,22 +62,18 @@ def fix_bash_brackets(elements):
 
 def parse_colons(elements):
     obj = {}
-    print(elements)
     for elem in elements:
         if ':' in elem:
             k,v = elem.split(':',1)
             if k not in obj:
-                obj[k] = v
+                obj[k] = typed_value(v)
             else:
-                obj[k] = [obj[k],v]
-    print(obj)
-    sub = []
+                obj[k] = [obj[k],typed_value(v)]
     for k in obj:
         if type(obj[k]) == list:
            obj[k] = parse_colons(obj[k])
     return obj
 
-    return main
 def load_json(filename):
     with open(filename) as f:
         json_dict = json.load(f)
@@ -117,7 +112,7 @@ def add_func(obj,key,value):
             obj[key].append(value)
             return
         #its not a list, so we are editing an existing value
-        print_err("'{}' already exists. Use --edit to change its value".format(key))
+        print_err("'{}' already has a value. Use --edit to modify it".format(key))
     except KeyError:
         # the key doesn't exist. this means add is valid
         obj[key] = value
@@ -145,7 +140,7 @@ def delete_func(obj,key,*ignored):
         except IndexError:
             if int(key) == 0:
                 print_err("the list is already empty")
-            print_err("There is no element with index",int(key))
+            print_err("There is no element with index {}. The largest index is {}".format(int(key),len(obj)-1))
 
 def typed_value(v):
     if v.isdigit():
