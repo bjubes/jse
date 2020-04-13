@@ -35,6 +35,7 @@ def parse_query(args,fn_args,name,func):
     if len(fn_args) is not 2:
         if all(arg[0] == "[" and arg[-1] == "]" for arg in fn_args[1:]):
             #the user has passed [value] and bash has messed with it.
+            print(fn_args[1:])
             value = fix_bash_brackets(fn_args[1:])
         else:
             # the user passed {value} and bash has messed with it
@@ -56,11 +57,43 @@ def fix_bash_brackets(elements):
         args = []
         for elem in elements:
             args.append(elem[1:-1].split(',',1)[i])
-        obj = parse_colons(args)
-        obj_list.append(obj)
+        # a hack to see when to parse nested vs semetric elements in a list
+        key = elements[0].split(':',1)[0][1:]
+        if key in elements[1] and (key in elements[len(elements)-2] or key in elements[2]):
+            #this is the dot product pattern of semetrical elements
+            return parse_brackets_semetric(elements)
+        else:
+            #nested parsing
+            obj = parse_colons(args)
+            obj_list.append(obj)
     return obj_list
 
+def parse_brackets_semetric(elements):
+    # hardcoded indexes where uniform vectors fall. has to do with
+    # where the identity matrix 1s are
+    indexes = []
+    length = len(elements)
+    if length == 4:
+        indexes = [0,3]
+    if length == 8:
+        indexes = [0,7]
+    if length == 9:
+        indexes = [0,4,8]
+    if length == 27:
+        indexes = [0,13,26]
+    
+    selected_elems = [elements[n] for n in indexes]
+    elems = [typed_value(s.replace('[', '[{').replace(']','}]').replace(',','},{')) for s in selected_elems]
+    combine = list(zip(*elems))
+    obj_list = []
+    for tup in combine:
+        obj = {}
+        for o in tup:
+            obj[list(o.keys())[0]] = list(o.values())[0]
+        obj_list.append(obj)
+    return obj_list
 def parse_colons(elements):
+    print(elements)
     obj = {}
     for elem in elements:
         if ':' in elem:
