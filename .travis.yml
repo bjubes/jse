@@ -10,4 +10,5 @@ python:
 install:
   - pip install pytest
 script:
+  - python setup.py develop
   - pytest
