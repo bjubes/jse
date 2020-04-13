@@ -1,0 +1,2 @@
+import jse
+jse.main()

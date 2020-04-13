@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "jse"
+version = "0.0.4"
+description = "quickly edit json files from the command line"
+authors = ["Brian Jubelirer <brian2386@gmail.com>"]
+readme = README.md
+repository = https://github.com/bjubes/jse
+classifiers = [
+    "Topic :: Software Development"
+]
+
+[tool.poetry.dependencies]
+python = "^3.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+jse = 'jse.jse:main'

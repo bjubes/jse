@@ -1,4 +1,4 @@
-from jse import *
+from jse.jse import *
 import pytest
 
 
