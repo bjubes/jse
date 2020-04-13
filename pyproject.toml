@@ -1,12 +1,15 @@
 [tool.poetry]
 name = "jse"
-version = "0.0.4"
-description = "quickly edit json files from the command line"
+version = "0.0.5"
+description = "Quickly edit json files from the command line"
 authors = ["Brian Jubelirer <brian2386@gmail.com>"]
-readme = README.md
-repository = https://github.com/bjubes/jse
+readme = "README.md"
+repository = "https://github.com/bjubes/jse"
 classifiers = [
-    "Topic :: Software Development"
+    "Topic :: Software Development",
+    "Topic :: Text Processing",
+    "Topic :: Utilities"
+
 ]
 
 [tool.poetry.dependencies]
