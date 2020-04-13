@@ -6,7 +6,7 @@ quickly edit json files from the command line
 jse is pragmatic and terse. It lets you edit json fast, without needing to care about quotes, types, exact indexes, or any of the stuff that makes json a pain.
 ## Usage
 ```
-$ jse <file> <mode> <key> <value>
+$ jse <file> <mode> <query> <value>
 ```
 #### TLDR Version
 edit an existing key: ``` -e --edit```
@@ -25,23 +25,24 @@ full [examples with json files](#examples) below
 
 ## Installing
 
-comming soon - pip install :)
+```
+pip3 install jse
+```
 
 ### Running from Source
-requiremets:
-- python 3
+Requiremets:
+- Python 3.7
 
-steps:
-
+Steps:
 1. clone the repository
-2. make it executable `chmod +x jse.py`
-3. put in on the path `ln -s /path/to/jse.py ~/.local/bin/jse`
+2. make the run script executable `chmod +x run.py`
+3. place jse on the path `ln -s /path/to/run.py ~/.local/bin/jse`
 
-jse has no package dependencies (it literally just edits json), but does use pytest for tests.
+jse has no runtime dependencies, but does use pytest for tests.
 
 
 ## Examples
-lets start with a json file
+Assume we have this json file
 ```json
 # example.json
 {
@@ -57,9 +58,9 @@ We want to delete the user alice using jse. All we need to do is specify `-d` or
 ```
 $ jse example.json -d users[0]
 ```
-we can use both index or dot notation
-```
-$ jse example.json -d users.0
+We can use both index or dot notation.
+```shell
+$ jse example.json -d users.0   #users.first or users.^ also work
 ```
 ```json
 # example.json
@@ -70,7 +71,7 @@ $ jse example.json -d users.0
     ]
 }
 ```
-now lets make charlie an admin. To edit an existing field we use the edit command with `-e` or `--edit`. Edit takes a key to change and its new value.
+Now lets make charlie an admin. To edit an existing field we use the edit command with `-e` or `--edit`. Edit takes a key to change and its new value.
 ```
 $ jse example.json -e users.1.admin true
 ```
@@ -95,7 +96,7 @@ $ jse example.json -a highscore [{score:32.5,user:bob,metadata:{ip:192.168.1.102
     ],
     "highscore": [
         {
-            "score": "32.5",
+            "score": 32.5,
             "user": "bob",
             "metadata": {
                 "ip": "192.168.1.102",
@@ -105,9 +106,9 @@ $ jse example.json -a highscore [{score:32.5,user:bob,metadata:{ip:192.168.1.102
     ]
 }
 ```
-jse also understands lists, so we can add new elements to a one without needing an explicit index. It will infer we are trying to append from `--add` instead of changing the list to an object (`--edit`)
+jse also understands lists, so we can add new elements to one without needing an explicit index. It will infer we are trying to append from `--add` instead of changing the list to an object (`--edit`)
 ```
-$ jse example.json -a highscore {"score":52,"user": "charlie"}
+$ jse example.json -a highscore {score:52,user:charlie}
 ```
 ```json
 {
@@ -131,7 +132,7 @@ $ jse example.json -a highscore {"score":52,"user": "charlie"}
     ]
 }
 ```
-error messages are also meant to be informative, because no one wants a KeyError
+jse's error messages are informative, because no one wants a KeyError
 ```
 $ jse example.json -a users.0.name "not bob"
 'name' already has a value. Use --edit to modify it
@@ -143,7 +144,7 @@ There is no element with index 2. The largest index is 1
 
 You can also delete mulitple keys using -d, by passing them seperately
 ```
-$ jse example.json -d users.0.age users.1.age
+$ jse example.json -d users.first.age users.1.age
 ```
 ```json
 {
