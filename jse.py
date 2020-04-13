@@ -33,10 +33,16 @@ def parse_query(args,fn_args,name,func):
     query = fn_args[0]
     value = fn_args[1]
     if len(fn_args) is not 2:
-        # this happens when you pass an obj as {} directly in bash
-       value = ",".join(fn_args[1:])          
-       value = "{{{}}}".format(value)
-    value = typed_value(value)
+        if all(arg[0] == "[" and arg[-1] == "]" for arg in fn_args[1:]):
+            #the user has passed [value] and bash has messed with it.
+            value = fix_bash_brackets(fn_args[1:])
+        else:
+            # the user passed {value} and bash has messed with it
+            value = ",".join(fn_args[1:])          
+            value = "{{{}}}".format(value)
+            value = typed_value(value)
+    else:
+        value = typed_value(value)
     obj = load_json(args.file)
     obj = operate_on_key(obj,query,value,func)
     if args.preview:
@@ -44,7 +50,35 @@ def parse_query(args,fn_args,name,func):
         return
     save_json(args.file,obj)
 
+def fix_bash_brackets(elements):
+    cnt = len(elements[0].split(','))
+    obj_list = []
+    for i in range(cnt):
+        args = []
+        for elem in elements:
+            args.append(elem[1:-1].split(',',1)[i])
+        obj = parse_colons(args)
+        obj_list.append(obj)
+    return obj_list
 
+def parse_colons(elements):
+    obj = {}
+    print(elements)
+    for elem in elements:
+        if ':' in elem:
+            k,v = elem.split(':',1)
+            if k not in obj:
+                obj[k] = v
+            else:
+                obj[k] = [obj[k],v]
+    print(obj)
+    sub = []
+    for k in obj:
+        if type(obj[k]) == list:
+           obj[k] = parse_colons(obj[k])
+    return obj
+
+    return main
 def load_json(filename):
     with open(filename) as f:
         json_dict = json.load(f)
