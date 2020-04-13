@@ -6,8 +6,8 @@ def test_basic_edit():
     obj = {'a': 'b'}
     query = 'a'
     value = 'x'
-    func = edit_func
-    operate_on_key(obj, query, value, func)
+    subobj,key = query_object(obj,query)
+    edit_func(subobj,key,value)
     assert obj == {'a': 'x'}
 
 
@@ -15,8 +15,8 @@ def test_basic_add():
     obj = {'a': 'b'}
     query = 'c'
     value = 'x'
-    func = add_func
-    operate_on_key(obj, query, value, func)
+    subobj,key = query_object(obj,query)
+    add_func(subobj,key,value)
     assert obj == {'a': 'b', 'c': 'x'}
 
 
@@ -24,8 +24,8 @@ def test_list_add_auto_index():
     listname = "mylist"
     obj = {listname: []}
     value = 'x'
-    func = add_func
-    operate_on_key(obj, listname, value, func)
+    subobj,key = query_object(obj,listname)
+    add_func(subobj,key,value)
     assert obj == {listname: [value]}
 
 
@@ -34,8 +34,8 @@ def test_list_add_manual_index():
     obj = {listname: []}
     query = listname + ".0"
     value = 'x'
-    func = add_func
-    operate_on_key(obj, query, value, func)
+    subobj,key = query_object(obj,query)
+    add_func(subobj,key,value)
     assert obj == {listname: [value]}
 
 
@@ -46,7 +46,8 @@ def test_obj_add():
     query = "my_obj.name"
     value = "waldo"
     func = add_func
-    operate_on_key(obj, query, value, func)
+    subobj,key = query_object(obj,query)
+    add_func(subobj,key,value)
     assert obj == {
         "my_obj": {
             "name": "waldo"
@@ -59,8 +60,8 @@ def test_obj_add_example():
     query = "highscore"
     value = "[{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}},{}]"
     value = typed_value(value)
-    func = add_func
-    operate_on_key(obj, query, value, func)
+    subobj,key = query_object(obj,query)
+    add_func(subobj,key,value)
 
     assert obj == {
         "highscore": [
@@ -87,8 +88,8 @@ def test_delete():
             "x": 9
         }
     }
-
-    operate_on_key(obj, "users.1", None, delete_func)
+    subobj,key = query_object(obj,"users.1")
+    delete_func(subobj,key)
     assert obj == {
         "users": [
             {"id": 1, "name": "mike"}
@@ -98,7 +99,8 @@ def test_delete():
             "x": 9
         }
     }
-    operate_on_key(obj, "map", None, delete_func)
+    subobj,key = query_object(obj,"map")
+    delete_func(subobj,key)
     assert obj == {
         "users": [
             {"id": 1, "name": "mike"}
@@ -106,7 +108,7 @@ def test_delete():
     }
 
 def test_list_regex_delete():
-    for exp in [('^','$'),('first','last')]:
+    for exp in [('^','$'),('first','last'),("0","-1")]:
         first = exp[0]
         last = exp[1]
         obj = {
@@ -122,7 +124,8 @@ def test_list_regex_delete():
             }
         }
         # delete last entry in list
-        operate_on_key(obj,"users." + last,None,delete_func)
+        subobj,key = query_object(obj,"users." + last)
+        delete_func(subobj,key)
         assert obj == {
             "users": [
                 {"id": 1, "name": "mike"},
@@ -135,7 +138,8 @@ def test_list_regex_delete():
             }
         }
         # delete first entry in list
-        operate_on_key(obj,"users."+first,None,delete_func)
+        subobj,key = query_object(obj,"users." + first)
+        delete_func(subobj,key)     
         assert obj == {
             "users": [
                 {"id":7,"name":"paul"},

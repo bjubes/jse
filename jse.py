@@ -15,18 +15,27 @@ def main():
 
     if args.delete:
         json = load_json(args.file)
-        for key in args.delete:
-            operate_on_key(json,key,None,delete_func)
+        for query in args.delete:
+            obj,key = query_object(json,query)
+            delete_func(obj,key)
         save_json(args.file,json) 
     elif args.add:
-        parse_query(args,args.add,"add",add_func)
+        query, value = parse_query(args,args.add,"add")
+        json = load_json(args.file)
+        obj,key = query_object(json,query)
+        add_func(obj,key,value)
+        save_json(args.file,json) 
     elif args.edit:
-        parse_query(args,args.edit,"edit",edit_func)
+        query, value = parse_query(args,args.edit,"edit")
+        json = load_json(args.file)
+        obj,key = query_object(json,query)
+        edit_func(obj,key,value)
+        save_json(args.file,json) 
     else:
         print_err("must select an operation. use --help to see options")
 
 # parses cmd line args and loads and alters the json object
-def parse_query(args,fn_args,name,func):
+def parse_query(args,fn_args,name):
     if len(fn_args) < 2:
         print_err(name,"takes a key and a value")
         return
@@ -47,11 +56,7 @@ def parse_query(args,fn_args,name,func):
             print_err("either you passed too many arguments or bash has preprocessed and mangled your input. Try putting your value in quotes.")
     else:
         value = typed_value(value)
-    obj = load_json(args.file)
-    operate_on_key(obj,query,value,func)
-    if args.preview:
-        return
-    save_json(args.file,obj)
+    return query, value
 
 def fix_bash_brackets(elements):
     cnt = len(elements[0].split(','))
@@ -95,6 +100,7 @@ def parse_brackets_semetric(elements):
             obj[list(o.keys())[0]] = list(o.values())[0]
         obj_list.append(obj)
     return obj_list
+
 def parse_colons(elements):
     print(elements)
     obj = {}
@@ -118,16 +124,6 @@ def load_json(filename):
 def save_json(filename, json_obj):
     with open(filename,'w') as f:
         json.dump(json_obj,f,indent=4)
-
-# operate on key modifies json by performing the function passed on the given query          
-def operate_on_key(json,query,value,func):
-    try:
-        obj,key = query_object(json,query)
-    except KeyError:
-       print("key error in query_object")
-
-    # do the requested operation based on mode (add,edit,delete)
-    func(obj,key,value)
 
 # use the query to find the sub object we have to modify
 def query_object(json,query):
@@ -167,7 +163,7 @@ def edit_func(obj,key,value):
     except TypeError:
         obj[int(key)] = value
 
-def delete_func(obj,key,*ignored):
+def delete_func(obj,key):
     try:
         del obj[key]
     except:
