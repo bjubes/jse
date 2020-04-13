@@ -42,7 +42,7 @@ jse has no package dependencies (it literally just edits json), but does use pyt
 
 ## Examples
 lets start with a json file
-```
+```json
 # example.json
 {
     "users": [
@@ -61,7 +61,7 @@ we can use both index or dot notation
 ```
 $ jse example.json -d users.0
 ```
-```
+```json
 # example.json
 {
     "users": [
@@ -74,7 +74,7 @@ now lets make charlie an admin. To edit an existing field we use the edit comman
 ```
 $ jse example.json -e users.1.admin true
 ```
-```
+```json
 # example.json
 {
     "users": [
@@ -87,7 +87,7 @@ jse is smart enough to infer datatypes from the command line. it can also accept
 ```
 $ jse example.json -a highscore [{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}}]
 ```
-```
+```json
 {
     "users": [
         {"name": "bob", "age": 57, "admin": true},
@@ -109,7 +109,7 @@ jse also understands lists, so we can add new elements to a one without needing 
 ```
 $ jse example.json -a highscore {"score":52,"user": "charlie"}
 ```
-```
+```json
 {
     "users": [
         {"name": "bob", "age": 57, "admin": true},
@@ -145,7 +145,7 @@ You can also delete mulitple keys using -d, by passing them seperately
 ```
 $ jse example.json -d users.0.age users.1.age
 ```
-```
+```json
 {
     "users": [
         {
