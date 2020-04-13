@@ -16,7 +16,7 @@ def main():
     if args.delete:
         json = load_json(args.file)
         for key in args.delete:
-            json = operate_on_key(json,key,None,delete_func)
+            operate_on_key(json,key,None,delete_func)
         save_json(args.file,json) 
     elif args.add:
         parse_query(args,args.add,"add",add_func)
@@ -48,7 +48,7 @@ def parse_query(args,fn_args,name,func):
     else:
         value = typed_value(value)
     obj = load_json(args.file)
-    obj = operate_on_key(obj,query,value,func)
+    operate_on_key(obj,query,value,func)
     if args.preview:
         return
     save_json(args.file,obj)
@@ -118,7 +118,8 @@ def load_json(filename):
 def save_json(filename, json_obj):
     with open(filename,'w') as f:
         json.dump(json_obj,f,indent=4)
-          
+
+# operate on key modifies json by performing the function passed on the given query          
 def operate_on_key(json,query,value,func):
     try:
         obj,key = query_object(json,query)
@@ -127,7 +128,6 @@ def operate_on_key(json,query,value,func):
 
     # do the requested operation based on mode (add,edit,delete)
     func(obj,key,value)
-    return json
 
 # use the query to find the sub object we have to modify
 def query_object(json,query):
@@ -177,6 +177,12 @@ def delete_func(obj,key,*ignored):
             if int(key) == 0:
                 print_err("the list is already empty")
             print_err("There is no element with index {}. The largest index is {}".format(int(key),len(obj)-1))
+        except ValueError:
+            # this is a list but we gave a non-integer as our key
+            if key == '^' or key == 'first':
+                del obj[0]
+            if key == '$' or key == 'last':
+                del obj[-1]
 
 def typed_value(v):
     if v.isdigit():
