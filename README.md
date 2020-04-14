@@ -132,7 +132,7 @@ $ jse example.json -a highscore {score:52,user:charlie}
     ]
 }
 ```
-jse's error messages are informative, because no one wants a KeyError
+jse's error messages are informative, because no one wants a generic KeyError
 ```
 $ jse example.json -a users.0.name "not bob"
 'name' already has a value. Use --edit to modify it

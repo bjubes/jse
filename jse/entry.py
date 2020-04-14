@@ -3,8 +3,46 @@ import argparse
 import json
 import sys
 
+
+class JSONEditor():
+
+    def __init__(self):
+        parser = argparse.ArgumentParser(
+            usage='''jse <file> <command> <query> <value>
+   
+commands:
+   e, edit     edit the queried key to a new value
+   a, add      add a new key-value or append to an existing key
+   d, delete   delete the key and associated value
+''') 
+        parser.add_argument('file')
+        parser.add_argument('command')
+        # parse_args defaults to [1:] for args, but you need to
+        # exclude the rest of the args too, or validation will fail
+        args = parser.parse_args(sys.argv[1:3])
+        if not hasattr(self, args.command):
+            print('Unrecognized command')
+            parser.print_help()
+            exit(1)
+        # use dispatch pattern to invoke method with same name
+        getattr(self, args.command)()
+    
+    add_desc = "add a new key-value or append to an existing key"
+    
+    def add(self):
+        parser = argparse.ArgumentParser(
+            description=JSONEditor.add_desc,
+            usage='''jse <file> add <query> <value>
+''')
+        parser.add_argument('query')
+        parser.add_argument('value',nargs='+')
+        args = parser.parse_args(sys.argv[3:])
+
+        print("query", args.query)
+        print("value", args.value)
+
 def main():
-    parser = argparse.ArgumentParser()
+   
     parser.add_argument("file", help="the JSON file to use")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-e","--edit", nargs='*', help="change the value of the json element")
@@ -51,11 +89,11 @@ def parse_query(args,fn_args,name):
                 # the user passed {value} and bash has messed with it
                 value = ",".join(fn_args[1:])          
                 value = "{{{}}}".format(value)
-                value = typed_value(value)
+                value = parse_value(value)
         except:
             print_err("either you passed too many arguments or bash has preprocessed and mangled your input. Try putting your value in quotes.")
     else:
-        value = typed_value(value)
+        value = parse_value(value)
     return query, value
 
 def fix_bash_brackets(elements):
@@ -91,7 +129,7 @@ def parse_brackets_semetric(elements):
         indexes = [0,13,26]
     
     selected_elems = [elements[n] for n in indexes]
-    elems = [typed_value(s.replace('[', '[{').replace(']','}]').replace(',','},{')) for s in selected_elems]
+    elems = [parse_value(s.replace('[', '[{').replace(']','}]').replace(',','},{')) for s in selected_elems]
     combine = list(zip(*elems))
     obj_list = []
     for tup in combine:
@@ -108,9 +146,9 @@ def parse_colons(elements):
         if ':' in elem:
             k,v = elem.split(':',1)
             if k not in obj:
-                obj[k] = typed_value(v)
+                obj[k] = parse_value(v)
             else:
-                obj[k] = [obj[k],typed_value(v)]
+                obj[k] = [obj[k],parse_value(v)]
     for k in obj:
         if type(obj[k]) == list:
            obj[k] = parse_colons(obj[k])
@@ -180,7 +218,8 @@ def delete_func(obj,key):
             if key == '$' or key == 'last':
                 del obj[-1]
 
-def typed_value(v):
+# convert any value in string representation into a python object or standard type
+def parse_value(v):
     if v.isdigit():
         return int(v)
     try:
@@ -198,7 +237,7 @@ def typed_value(v):
     
     if v[0] is '[' and v[-1] is ']':
         elems = split_on_root(v[1:-1],',')
-        return [typed_value(e) for e in elems]
+        return [parse_value(e) for e in elems]
 
     if v[0] is '{' and v[-1] is '}':
         if len(v.replace(" ","")) ==2:
@@ -207,7 +246,7 @@ def typed_value(v):
         elems = split_on_root(v[1:-1],',')
         for elem in elems:
             key,value = elem.split(":",1)
-            obj[key] = typed_value(value)
+            obj[key] = parse_value(value)
         return obj
         
     return str(v)
@@ -235,4 +274,4 @@ def print_err(*args, **kwargs):
     exit(1)
 
 if __name__ == "__main__":
-    main()
+   JSONEditor()

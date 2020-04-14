@@ -10,7 +10,6 @@ python:
 install:
   - pip install pytest
 script:
-  - python setup.py develop
   - pytest
 notifications:
   email: false
