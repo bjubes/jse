@@ -2,4 +2,4 @@
 from jse import entry
 
 if __name__ == '__main__':
-    entry.jse()
+    entry.main()

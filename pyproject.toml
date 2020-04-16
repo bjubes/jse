@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jse"
-version = "0.0.5"
+version = "0.0.6"
 description = "Quickly edit json files from the command line"
 authors = ["Brian Jubelirer <brian2386@gmail.com>"]
 readme = "README.md"
@@ -24,4 +24,4 @@ requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry.scripts]
-jse = 'jse.entry:jse'
+jse = 'jse.entry:main'

@@ -6,7 +6,7 @@ import click
 from .editor import *
 from .bash import *
 
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 
 class AliasedGroup(click.Group):
     def get_command(self, ctx, cmd_name):
@@ -24,10 +24,10 @@ class AliasedGroup(click.Group):
 @click.argument('file')
 @click.pass_context
 @click.version_option(version=VERSION)
-def jse(ctx,file):
+def main(ctx,file):
     ctx.obj = file
 
-@jse.command(short_help='add a new element or append to a list')
+@main.command(short_help='add a new element or append to a list')
 @click.argument('query')
 @click.argument('value', nargs=-1)
 @click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
@@ -42,7 +42,7 @@ def add(file,query,value,preview):
         return
     save_json(file,json) 
 
-@jse.command(short_help='change an existing key to a new value')
+@main.command(short_help='change an existing key to a new value')
 @click.argument('query')
 @click.argument('value', nargs=-1)
 @click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
@@ -57,7 +57,7 @@ def edit(file,query,value,preview):
         return
     save_json(file,json) 
 
-@jse.command(short_help='delete an element')
+@main.command(short_help='delete an element')
 @click.argument('query', nargs=-1)
 @click.pass_obj
 def delete(file,query):
