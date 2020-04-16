@@ -1,7 +1,8 @@
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from jse.entry import *
+from jse.editor import *
+from jse.bash import *
 import pytest
 
 

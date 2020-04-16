@@ -1,2 +1,2 @@
-import jse
-jse.jse()
+import entry
+entry.main()

@@ -6,7 +6,7 @@ import click
 from .editor import *
 from .bash import *
 
-VERSION = "0.0.6"
+VERSION = "0.0.8"
 
 class AliasedGroup(click.Group):
     def get_command(self, ctx, cmd_name):
@@ -34,13 +34,14 @@ def main(ctx,file):
 @click.pass_obj
 def add(file,query,value,preview):
     value = parse_value_from_bash(value)
-    json = load_json(file)
-    obj,key = query_object(json,query)
-    add_func(obj,key,value)
-    if preview:
-        print(json)
-        return
-    save_json(file,json) 
+    with open(file,'r+') as f:
+        json_obj = json.load(f)         
+        obj,key = query_object(json_obj,query)
+        add_func(obj,key,value)
+        if preview:
+            print(json.dumps(json_obj,indent=4))
+            return
+        save_json(f,json_obj)
 
 @main.command(short_help='change an existing key to a new value')
 @click.argument('query')
@@ -49,33 +50,30 @@ def add(file,query,value,preview):
 @click.pass_obj
 def edit(file,query,value,preview):
     value = parse_value_from_bash(value)
-    json = load_json(file)
-    obj,key = query_object(json,query)
-    edit_func(obj,key,value)
-    if preview:
-        print(json)
-        return
-    save_json(file,json) 
+    with open(file,'r+') as f:
+        json_obj = json.load(f)         
+        obj,key = query_object(json_obj,query)
+        edit_func(obj,key,value)
+        if preview:
+            print(json.dumps(json_obj,indent=4))
+            return
+        save_json(f,json_obj)
 
 @main.command(short_help='delete an element')
 @click.argument('query', nargs=-1)
 @click.pass_obj
 def delete(file,query):
-    json = load_json(file)
-    for q in query:
-        obj,key = query_object(json,q)
-        delete_func(obj,key)
-    save_json(file,json) 
+   with open(file,'r+') as f:
+        json_obj = json.load(f)       
+        for q in query:
+            obj,key = query_object(json_obj,q)
+            delete_func(obj,key)
+        save_json(f,json_obj) 
 
-def load_json(filename):
-    with open(filename) as f:
-        json_dict = json.load(f)
-        return json_dict
-          
-def save_json(filename, json_obj):
-    with open(filename,'w') as f:
+def save_json(f, json_obj):
+        f.seek(0)
+        f.truncate()
         json.dump(json_obj,f,indent=4)
-
 
 def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -83,4 +81,4 @@ def print_err(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    jse()
+    main()
