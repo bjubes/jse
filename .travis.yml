@@ -1,6 +1,5 @@
 language: python
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
@@ -8,9 +7,9 @@ python:
   - "3.8-dev"  
   - "nightly"  
 install:
-  - pip install pytest
+  - pip install pipenv
+  - pipenv install
 script:
-  - python setup.py develop
   - pytest
 notifications:
   email: false

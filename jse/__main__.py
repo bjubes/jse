@@ -1,2 +1,2 @@
 import jse
-jse.main()
+jse.jse()

@@ -1,4 +1,7 @@
-from jse.jse import *
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from jse.entry import *
 import pytest
 
 
@@ -59,7 +62,7 @@ def test_obj_add_example():
     obj = {}
     query = "highscore"
     value = "[{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}},{}]"
-    value = typed_value(value)
+    value = parse_value(value)
     subobj,key = query_object(obj,query)
     add_func(subobj,key,value)
 
