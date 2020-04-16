@@ -193,11 +193,13 @@ def test_delete_list_errors():
         ],
         'listname':[]
     }
+    # bad regex or non-integer key
     with pytest.raises(EditorError) as err:
         subobj,key = query_object(obj,"a.badregex")
         delete_func(subobj,key)
     assert "badregex" in str(err.value)
 
+    # indexing on empty list
     with pytest.raises(EditorError) as err:
         subobj,key = query_object(obj,"listname.3")
         delete_func(subobj,key)
@@ -208,9 +210,25 @@ def test_delete_list_errors():
         delete_func(subobj,key)
     assert "empty" in str(err.value)
 
+    # index out of bounds
     with pytest.raises(EditorError) as err:
         subobj,key = query_object(obj,"a.3")
         delete_func(subobj,key)
     assert "index" in str(err.value)
+
+def test_errors_on_adding_list():
+    obj = {'list': [0,1,2]}
+
+    # add beyond range
+    with pytest.raises(EditorError) as err :
+        subobj,key = query_object(obj,"list.5")
+        add_func(subobj,key,"value")
+
+    # add existing value
+    with pytest.raises(EditorError) as err :
+        subobj,key = query_object(obj,"list.1")
+        add_func(subobj,key,"value")
+    assert "has a value" in str(err.value)
+
 
 # todo - test error handling and seperate exit from error states

@@ -8,6 +8,8 @@ def query_object(json,query):
     for k in query[:-1]:
         try:
             obj = obj[k]
+        except KeyError as err:
+            raise EditorError("'{}' doesn't exist. you can add it with --add".format(k)) from err
         except TypeError:
             obj = obj[int(k)]
     return obj, query[-1]
@@ -81,6 +83,11 @@ def add_func(obj,key,value):
         # this is a list
         if int(key) == len(obj):
             obj.append(value)
+        elif int(key) < len(obj):
+            raise EditorError("'{}' already has a value. Use --edit to modify it".format(key))
+        else:
+            raise EditorError("the list only has {} elements. remove the index from your query to add to the end of this list automatically".format(len(obj)))
+
 
 def edit_func(obj,key,value):
     try:
@@ -94,6 +101,8 @@ def edit_func(obj,key,value):
             obj[int(key)] = value
         except ValueError as err:
             raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
+        except IndexError as err:
+            raise EditorError("there is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
 
 def delete_func(obj,key):
     try:
