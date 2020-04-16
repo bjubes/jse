@@ -87,7 +87,7 @@ def edit_func(obj,key,value):
         if key not in obj:
             if isinstance(obj) == list:
                 raise TypeError
-            raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
+            raise EditorError("'{}' doesn't exist. you can add it with --add".format(key))
         obj[key] = value
     except TypeError:
         try:
@@ -104,9 +104,9 @@ def delete_func(obj,key):
         try:
             del obj[int(key)]
         except IndexError as err:
-            if int(key) == 0:
+            if len(obj) == 0:
                 raise EditorError("the list is already empty") from err
-            raise EditorError("There is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
+            raise EditorError("there is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
         except ValueError as err:
             # this is a list but we gave a non-integer as our key
             if key == '^' or key == 'first':

@@ -154,6 +154,63 @@ def test_list_regex_delete():
                 "x": 9
             }
         }
+    
 
+def test_add_existing_key():
+    with pytest.raises(EditorError) as err :
+        obj = {'nameofthekey': 'b'}
+        subobj,key = query_object(obj,"nameofthekey")
+        add_func(subobj,key,"value")
+    assert "nameofthekey" in str(err.value)
+
+
+def test_edit_non_existing_key():
+    with pytest.raises(EditorError) as err:
+        obj = {'a': 'b'}
+        subobj,key = query_object(obj,"nameofthekey")
+        edit_func(subobj,key,"new value")
+    assert "nameofthekey" in str(err.value)
+
+
+def test_delete_non_existing_key():
+    obj = {'a': {'sub1':0,'sub2':1}}
+
+    with pytest.raises(EditorError) as err:
+        subobj,key = query_object(obj,"nameofthekey")
+        delete_func(subobj,key)
+    assert "nameofthekey" in str(err.value)
+
+    with pytest.raises(EditorError) as err:
+        subobj,key = query_object(obj,"a.nameofsubkey")
+        edit_func(subobj,key,"new value")
+    assert "nameofsubkey" in str(err.value)
+
+
+def test_delete_list_errors():
+    obj = {
+        'a' : [
+            1,2,3
+        ],
+        'listname':[]
+    }
+    with pytest.raises(EditorError) as err:
+        subobj,key = query_object(obj,"a.badregex")
+        delete_func(subobj,key)
+    assert "badregex" in str(err.value)
+
+    with pytest.raises(EditorError) as err:
+        subobj,key = query_object(obj,"listname.3")
+        delete_func(subobj,key)
+    assert "empty" in str(err.value)
+
+    with pytest.raises(EditorError) as err:
+        subobj,key = query_object(obj,"listname.0")
+        delete_func(subobj,key)
+    assert "empty" in str(err.value)
+
+    with pytest.raises(EditorError) as err:
+        subobj,key = query_object(obj,"a.3")
+        delete_func(subobj,key)
+    assert "index" in str(err.value)
 
 # todo - test error handling and seperate exit from error states
