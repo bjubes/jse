@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from jse.entry import main
+from jse import entry
 
 if __name__ == '__main__':
-    main()
+    entry.jse()

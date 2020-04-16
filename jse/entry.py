@@ -1,100 +1,72 @@
 #!/usr/bin/env python3
-import argparse
 import json
 import sys
+import click
 
+@click.group()
+@click.argument('file')
+@click.pass_context
+def jse(ctx,file):
+    ctx.obj = file
 
-class JSONEditor():
-
-    def __init__(self):
-        parser = argparse.ArgumentParser(
-            usage='''jse <file> <command> <query> <value>
-   
-commands:
-   e, edit     edit the queried key to a new value
-   a, add      add a new key-value or append to an existing key
-   d, delete   delete the key and associated value
-''') 
-        parser.add_argument('file')
-        parser.add_argument('command')
-        # parse_args defaults to [1:] for args, but you need to
-        # exclude the rest of the args too, or validation will fail
-        args = parser.parse_args(sys.argv[1:3])
-        if not hasattr(self, args.command):
-            print('Unrecognized command')
-            parser.print_help()
-            exit(1)
-        # use dispatch pattern to invoke method with same name
-        getattr(self, args.command)()
-    
-    add_desc = "add a new key-value or append to an existing key"
-    
-    def add(self):
-        parser = argparse.ArgumentParser(
-            description=JSONEditor.add_desc,
-            usage='''jse <file> add <query> <value>
-''')
-        parser.add_argument('query')
-        parser.add_argument('value',nargs='+')
-        args = parser.parse_args(sys.argv[3:])
-
-        print("query", args.query)
-        print("value", args.value)
-
-def main():
-   
-    parser.add_argument("file", help="the JSON file to use")
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument("-e","--edit", nargs='*', help="change the value of the json element")
-    group.add_argument("-a","--add", nargs='*', help="add a json element")
-    group.add_argument("-d","--delete", nargs='*', help="remove the json element")
-    parser.add_argument("--preview",action="store_true",help="preview file changes without saving to disk")
-    args = parser.parse_args()
-
-    if args.delete:
-        json = load_json(args.file)
-        for query in args.delete:
-            obj,key = query_object(json,query)
-            delete_func(obj,key)
-        save_json(args.file,json) 
-    elif args.add:
-        query, value = parse_query(args,args.add,"add")
-        json = load_json(args.file)
-        obj,key = query_object(json,query)
-        add_func(obj,key,value)
-        save_json(args.file,json) 
-    elif args.edit:
-        query, value = parse_query(args,args.edit,"edit")
-        json = load_json(args.file)
-        obj,key = query_object(json,query)
-        edit_func(obj,key,value)
-        save_json(args.file,json) 
-    else:
-        print_err("must select an operation. use --help to see options")
-
-# parses cmd line args and loads and alters the json object
-def parse_query(args,fn_args,name):
-    if len(fn_args) < 2:
-        print_err(name,"takes a key and a value")
+@jse.command()
+@click.argument('query')
+@click.argument('value', nargs=-1)
+@click.pass_obj
+def add(file,query,value,preview):
+    value = parse_value_from_bash(value)
+    json = load_json(file)
+    obj,key = query_object(json,query)
+    add_func(obj,key,value)
+    if preview:
+        print(json)
         return
-    query = fn_args[0]
-    value = fn_args[1]
-    if len(fn_args) is not 2:
-        try:
-            if all(arg[0] == "[" and arg[-1] == "]" for arg in fn_args[1:]):
-                #the user has passed [value] and bash has messed with it.
-                print(fn_args[1:])
-                value = fix_bash_brackets(fn_args[1:])
-            else:
-                # the user passed {value} and bash has messed with it
-                value = ",".join(fn_args[1:])          
-                value = "{{{}}}".format(value)
-                value = parse_value(value)
-        except:
-            print_err("either you passed too many arguments or bash has preprocessed and mangled your input. Try putting your value in quotes.")
-    else:
-        value = parse_value(value)
-    return query, value
+    save_json(file,json) 
+
+
+@jse.command()
+@click.argument('query')
+@click.argument('value', nargs=-1)
+@click.pass_obj
+def edit(file,query,value,preview):
+    value = parse_value_from_bash(query)
+    json = load_json(file)
+    obj,key = query_object(json,query)
+    edit_func(obj,key,value)
+    if preview:
+        print(json)
+        return
+    save_json(file,json) 
+
+@jse.command()
+@click.argument('query', nargs=-1)
+@click.pass_obj
+def delete(file,query):
+    json = load_json(file)
+    for q in query:
+        obj,key = query_object(json,q)
+        delete_func(obj,key)
+    save_json(file,json) 
+
+# values can be corrupted into a list of arguments by bash brace expansion
+# this function handles converting value that was passed via the cmdline
+# if the value is a string not from the commandline, call parse_value directly.
+def parse_value_from_bash(value):
+    if len(value) == 1:
+        return parse_value(value[0])
+    try:
+        if all(arg[0] == "[" and arg[-1] == "]" for arg in value):
+            #the user has passed [value] and bash has messed with it.
+            print(value)
+            value = fix_bash_brackets(value)
+        else:
+            # the user passed {value} and bash has messed with it
+            value = ",".join(value)          
+            value = "{{{}}}".format(value)
+            value = parse_value(value)
+    except:
+        print_err("too many arguments were passed or bash has preprocessed and mangled your input. Try putting VALUE in quotes.")
+    return value
 
 def fix_bash_brackets(elements):
     cnt = len(elements[0].split(','))
@@ -273,5 +245,6 @@ def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     exit(1)
 
-if __name__ == "__main__":
-   JSONEditor()
+
+if __name__ == '__main__':
+    jse()
