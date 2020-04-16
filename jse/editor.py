@@ -90,7 +90,10 @@ def edit_func(obj,key,value):
             print_err("'{}' doesn't exist. you can add it with --add".format(key,obj))
         obj[key] = value
     except TypeError:
-        obj[int(key)] = value
+        try:
+            obj[int(key)] = value
+        except ValueError:
+            print_err("'{}' doesn't exist. you can add it with --add".format(key,obj))
 
 def delete_func(obj,key):
     try:

@@ -29,7 +29,7 @@ def main(ctx,file):
 
 @main.command(short_help='add a new element or append to a list')
 @click.argument('query')
-@click.argument('value', nargs=-1)
+@click.argument('value', nargs=-1, required=True)
 @click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
 @click.pass_obj
 def add(file,query,value,preview):
@@ -45,7 +45,7 @@ def add(file,query,value,preview):
 
 @main.command(short_help='change an existing key to a new value')
 @click.argument('query')
-@click.argument('value', nargs=-1)
+@click.argument('value', nargs=-1, required=True)
 @click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
 @click.pass_obj
 def edit(file,query,value,preview):
