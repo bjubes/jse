@@ -132,7 +132,7 @@ dmypy.json
 .DS_Store
 
 # json file for testing
-test.json
+example.json
 
 # ignore vscode settings for now
 .vscode/
