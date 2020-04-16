@@ -31,44 +31,69 @@ def main(ctx,file):
 @click.argument('query')
 @click.argument('value', nargs=-1, required=True)
 @click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
+@click.option('-d','--debug', is_flag=True,help="get debugging information")
 @click.pass_obj
-def add(file,query,value,preview):
-    value = parse_value_from_bash(value)
-    with open(file,'r+') as f:
-        json_obj = json.load(f)         
-        obj,key = query_object(json_obj,query)
-        add_func(obj,key,value)
-        if preview:
-            print(json.dumps(json_obj,indent=4))
-            return
-        save_json(f,json_obj)
+def add(file,query,value,preview,debug):
+    try:
+        value = parse_value_from_bash(value)
+        with open(file,'r+') as f:
+            json_obj = json.load(f)         
+            obj,key = query_object(json_obj,query)
+            add_func(obj,key,value)
+            if preview:
+                print(json.dumps(json_obj,indent=4))
+                return
+            save_json(f,json_obj)
+    except EditorError as err:
+            print_err(err)
+            if debug:
+                print("Debug enabled. Stack Trace:\n")
+                raise err
 
 @main.command(short_help='change an existing key to a new value')
 @click.argument('query')
 @click.argument('value', nargs=-1, required=True)
 @click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
+@click.option('-d','--debug', is_flag=True,help="get debugging information")
 @click.pass_obj
-def edit(file,query,value,preview):
-    value = parse_value_from_bash(value)
-    with open(file,'r+') as f:
-        json_obj = json.load(f)         
-        obj,key = query_object(json_obj,query)
-        edit_func(obj,key,value)
-        if preview:
-            print(json.dumps(json_obj,indent=4))
-            return
-        save_json(f,json_obj)
+def edit(file,query,value,preview,debug):
+    try:
+        value = parse_value_from_bash(value)
+        with open(file,'r+') as f:
+            json_obj = json.load(f)         
+            obj,key = query_object(json_obj,query)
+            edit_func(obj,key,value)
+            if preview:
+                print(json.dumps(json_obj,indent=4))
+                return
+            save_json(f,json_obj)
+    except EditorError as err:
+        print_err(err)
+        if debug:
+            print("Debug enabled. Stack Trace:\n")
+            raise err
 
 @main.command(short_help='delete an element')
 @click.argument('query', nargs=-1)
+@click.option('-p','--preview', is_flag=True,help="preview change without writing to file")
+@click.option('-d','--debug', is_flag=True,help="get debugging information")
 @click.pass_obj
-def delete(file,query):
-   with open(file,'r+') as f:
-        json_obj = json.load(f)       
-        for q in query:
-            obj,key = query_object(json_obj,q)
-            delete_func(obj,key)
-        save_json(f,json_obj) 
+def delete(file,query,preview,debug):
+    try:
+        with open(file,'r+') as f:
+            json_obj = json.load(f)       
+            for q in query:
+                obj,key = query_object(json_obj,q)
+                delete_func(obj,key)
+            if preview:
+                print(json.dumps(json_obj,indent=4))
+                return
+            save_json(f,json_obj)
+    except EditorError as err:
+        print_err(err)
+        if debug:
+            print("Debug enabled. Stack Trace:\n")
+            raise err
 
 def save_json(f, json_obj):
         f.seek(0)
@@ -77,7 +102,6 @@ def save_json(f, json_obj):
 
 def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
-    exit(1)
 
 
 if __name__ == '__main__':

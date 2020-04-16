@@ -17,8 +17,8 @@ def parse_value_from_bash(value):
             value = ",".join(value)          
             value = "{{{}}}".format(value)
             value = parse_value(value)
-    except:
-        print_err("too many arguments were passed or bash has preprocessed and mangled your input. Try putting VALUE in quotes.")
+    except Exception as err:
+        raise EditorError("too many arguments were passed or bash has preprocessed and mangled your input. Try putting VALUE in quotes.") from err
     return value
 
 def fix_bash_brackets(elements):

@@ -73,7 +73,7 @@ def add_func(obj,key,value):
             obj[key].append(value)
             return
         #its not a list, so we are editing an existing value
-        print_err("'{}' already has a value. Use --edit to modify it".format(key))
+        raise EditorError("'{}' already has a value. Use --edit to modify it".format(key))
     except KeyError:
         # the key doesn't exist. this means add is valid
         obj[key] = value
@@ -87,34 +87,35 @@ def edit_func(obj,key,value):
         if key not in obj:
             if isinstance(obj) == list:
                 raise TypeError
-            print_err("'{}' doesn't exist. you can add it with --add".format(key,obj))
+            raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
         obj[key] = value
     except TypeError:
         try:
             obj[int(key)] = value
-        except ValueError:
-            print_err("'{}' doesn't exist. you can add it with --add".format(key,obj))
+        except ValueError as err:
+            raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
 
 def delete_func(obj,key):
     try:
         del obj[key]
+    except KeyError as err:
+       raise EditorError("'{}' doesn't exist.".format(key)) from err
     except:
         try:
             del obj[int(key)]
-        except IndexError:
+        except IndexError as err:
             if int(key) == 0:
-                print_err("the list is already empty")
-            print_err("There is no element with index {}. The largest index is {}".format(int(key),len(obj)-1))
-        except ValueError:
+                raise EditorError("the list is already empty") from err
+            raise EditorError("There is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
+        except ValueError as err:
             # this is a list but we gave a non-integer as our key
             if key == '^' or key == 'first':
                 del obj[0]
-            if key == '$' or key == 'last':
+            elif key == '$' or key == 'last':
                 del obj[-1]
+            else:
+                raise EditorError("'{}' is not a valid list index.".format(key)) from err
 
 
-
-
-def print_err(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-    exit(1)
+class EditorError(Exception):
+    pass
