@@ -229,6 +229,3 @@ def test_errors_on_adding_list():
         subobj,key = query_object(obj,"list.1")
         add_func(subobj,key,"value")
     assert "has a value" in str(err.value)
-
-
-# todo - test error handling and seperate exit from error states
