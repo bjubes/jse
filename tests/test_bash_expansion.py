@@ -15,6 +15,24 @@ def test_nested_object():
                          'client':'firefox'
                      }}]
 
+def test_nested_object_list():
+    #input: [{score:32.5,user:bob,metadata:{ip:192.168.1.102,client:firefox}}, {score:21.0,user:steve,metadata:{ip:192.168.1.147,client:chrome}}]
+    corrupted_input = ['[score:32.5,', '[user:bob,', '[metadata:ip:192.168.1.102,', '[metadata:client:firefox,', 'score:21.0]', 'user:steve]', 'metadata:ip:192.168.1.147]', 'metadata:client:chrome]']
+    value = parse_bash_brackets_value(corrupted_input)
+    assert value == [{'user':'bob',
+                     'score': 32.5,
+                     'metadata':{
+                         'ip':'192.168.1.102',
+                         'client':'firefox'
+                     }},
+                     {'user':'steve',
+                     'score': 21.0,
+                     'metadata':{
+                         'ip':'192.168.1.147',
+                         'client':'chrome'
+                     }}]
+
+
 def test_same_keys_object_list():
     # 3x3
     #input: [{name:bob,id:1},{name:steve,id:3}, {name:ted,id:5}]
@@ -51,21 +69,15 @@ def test_same_keys_object_list():
         {'name':'ted','id':5}
     ]
 
-# failling currently
-# 
-# need to implement a consistent way to deal with
-# any length list with objects with any number of parameters
-#
-# def test_unique_object_list():
-#     # 2x2
-#     #input:  [{a:1,b:2},{c:3,d:4}]
-#     corrupted_input = ['[a:1,c:3]', '[a:1,d:4]', '[b:2,c:3]', '[b:2,d:4]']
-#     value = fix_bash_brackets(corrupted_input)
-#     assert value == [
-#         {"a":1,"b":2},
-#         {"b":3,"c":4}
-#     ]
-
+def test_unique_object_list_2x2():
+    # 2x2
+    #input:  [{a:1,b:2},{c:3,d:4}]
+    corrupted_input = ['[a:1,c:3]', '[a:1,d:4]', '[b:2,c:3]', '[b:2,d:4]']
+    value = parse_bash_brackets_value(corrupted_input)
+    assert value == [
+        {"a":1,"b":2},
+        {"c":3,"d":4}
+    ]
 
 def test_simple_obj_list():
     # 3x1
@@ -84,4 +96,24 @@ def test_simple_obj_list():
         {"a":1},
         {"b":2},
         {"c":3}
+    ]
+
+def test_unique_object_list_3x2():
+    #input: [{a:1,b:2,c:3},{d:4,e:5,f:6}]
+    corrupted_input = ['[a:1,d:4]', '[a:1,e:5]', '[a:1,f:6]', '[b:2,d:4]', '[b:2,e:5]', '[b:2,f:6]', '[c:3,d:4]', '[c:3,e:5]', '[c:3,f:6]']
+    value = parse_bash_brackets_value(corrupted_input)
+    assert value == [
+       {"a":1,"b":2,"c":3},
+       {"d":4,"e":5,"f":6}
+    ]
+
+
+def test_unique_object_list_2x3():
+    #input: [{a:1,b:2},{c:3,d:4},{e:5,f:6}]
+    corrupted_input = ['[a:1,c:3,e:5]', '[a:1,c:3,f:6]', '[a:1,d:4,e:5]', '[a:1,d:4,f:6]', '[b:2,c:3,e:5]', '[b:2,c:3,f:6]', '[b:2,d:4,e:5]', '[b:2,d:4,f:6]']
+    value = parse_bash_brackets_value(corrupted_input)
+    assert value == [
+       {"a":1,"b":2},
+       {"c":3,"d":4},
+       {"e":5,"f":6}
     ]

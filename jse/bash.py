@@ -27,8 +27,7 @@ def parse_value_from_bash(value):
 def parse_bash_brackets_value(elements):
     if any(x[:x.find(',')].count(':')>1 for x in elements):
         # there are subkeys in this object
-        elements = [ e[1:-1] for e in elements]
-        return [parse_nested_object(elements)]
+        return parse_nested_object_list(elements)
     elif all(x.count(',') == 0 for x in elements):
         # no commas in any element means there is only one element in the list
         return parse_split_object(elements)
@@ -69,8 +68,36 @@ def parse_brackets_semetric(elements):
     fixed_input = []
     for obj_i in range(n_obj):
         obj = {}
-        for obj_a in range(n_attr):
-            obj[tree[0][obj_i][0]] = tree[0][obj_i][1]
+        for atr_i in range(n_attr):
+            # rem_obj is how many objects 
+            tree_index = atr_i*n_attr**((n_obj-1-obj_i))
+            k = tree[tree_index][obj_i][0] 
+            v = tree[tree_index][obj_i][1]
+            obj[k] = parse_value(v)
+        fixed_input.append(obj)
+    return fixed_input
+
+def parse_nested_object_list(elements):
+    fixed_list = []
+    elems = []
+    for e in elements:
+        elem = e
+        if e[0] == '[':
+            elem = elem[1:]
+        if e[-1] == ']' or e[-1] ==',':
+            elem = elem[:-1]
+        elems.append(elem)
+    print(elems)
+    ptr = 0
+    key = None
+    for i,e in enumerate(elems):
+        if key == None:
+            key = e.split(':',1)[0]
+        elif e.split(':',1)[0] == key:
+            fixed_list.append(parse_nested_object(elems[ptr:i]))
+            ptr = i
+    fixed_list.append(parse_nested_object(elems[ptr:]))
+    return fixed_list
 
 def parse_nested_object(elements):
     obj = {}
