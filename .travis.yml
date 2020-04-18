@@ -7,9 +7,10 @@ python:
   - "nightly"  
 install:
   - pip install pipenv
-  - pipenv install
-  - pipenv install pytest
+  - pipenv install pytest pytest-cov coveralls
 script:
-  - pytest
+  - pytest --cov=jse
+after_success:
+  - coveralls
 notifications:
   email: false

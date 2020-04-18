@@ -20,8 +20,6 @@ def query_object(json,query):
                 obj = obj[int(k)]
             except IndexError as err:
                 raise EditorError(f"there is no element with index {k}. The largest index is {len(obj)-1}") from err
-            except ValueError as err:
-                raise EditorError(f"the key '{k}' doesn't exist. you can add it with --add") from err
     return obj, query[-1]
 
 # convert any value in string representation into a python object or standard type
@@ -107,7 +105,7 @@ def add_func(obj,key,value):
 def edit_func(obj,key,value):
     try:
         if key not in obj:
-            if isinstance(obj) == list:
+            if isinstance(obj,list):
                 raise TypeError
             raise EditorError(f"'{key}' doesn't exist. you can add it with --add")
         obj[key] = value
@@ -118,8 +116,6 @@ def edit_func(obj,key,value):
             elif key.lower() in LAST_EXPR:
                key = -1
             obj[int(key)] = value
-        except ValueError as err:
-            raise EditorError(f"'{key}' doesn't exist. you can add it with --add".format(key)) from err
         except IndexError as err:
             raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
 

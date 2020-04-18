@@ -11,16 +11,16 @@ def parse_value_from_bash(value):
     try:
         if all(arg[0] == "[" and arg[-1] == "]" for arg in value):
             # the user has passed [value] and bash has messed with it.
-            print(value)
-            value = parse_bash_brackets_value(value)
+            return parse_bash_brackets_value(value)
         else:
             # the user passed {value} and bash has messed with it
-            value = ",".join(value)          
-            value = f"{{{value}}}"
-            value = parse_value(value)
+            val = ",".join(value)          
+            val = f"{{{val}}}"
+            return parse_value(val)
     except Exception as err:
+        if not isinstance(value,str) and any(v == '=' for v in value):
+            raise EditorError("do not use '=' when assigning a key to a value") from err
         raise EditorError("too many arguments were passed or bash has preprocessed and mangled your input. Try putting VALUE in quotes.") from err
-    return value
 
 # takes in elements from bash and returns the value as a parsed python object
 # performs a series of checks and passes work to other functions

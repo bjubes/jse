@@ -128,3 +128,11 @@ def test_unique_object_list_3x4():
         {"g":7,"h":8,"i":9},
         {"j":10,"k":11,"l":12}
     ]
+
+def test_simple_object():
+    #input: {a:1,b:2,c:3}
+    corrupted_input = ['a:1', 'b:2', 'c:3']
+    value = parse_value_from_bash(corrupted_input)
+    assert value == {
+        "a":1,"b":2,"c":3
+    }
