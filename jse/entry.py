@@ -21,7 +21,7 @@ class AliasedGroup(click.Group):
         ctx.fail('Too many matches: {}'.format(', '.join(sorted(matches))))
 
 @click.group(cls=AliasedGroup)
-@click.argument('file')
+@click.argument('file',type=click.Path(exists=True))
 @click.pass_context
 @click.version_option(version=VERSION)
 def main(ctx,file):
