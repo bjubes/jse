@@ -56,11 +56,11 @@ Assume we have this json file
 
 We want to delete the user alice using jse. All we need to do is specify `-d` or `--delete` mode and the path to her `user` object
 ```
-$ jse example.json -d users[0]
+$ jse example.json d users[0]
 ```
 We can use both index or dot notation.
 ```shell
-$ jse example.json -d users.0   #users.first or users.^ also work
+$ jse example.json d users.0   #users.first or users.^ also work
 ```
 ```json
 # example.json
@@ -106,7 +106,7 @@ $ jse example.json a highscore [{score:32.5,user:bob,metadata:{ip:192.168.1.102,
     ]
 }
 ```
-jse also understands lists, so we can add new elements to one without needing an explicit index. It will infer we are trying to append from `add` instead of changing the list to an object (`edit`)
+jse also understands lists, so we can add new elements to one without needing an explicit index. It will infer we are trying to append from `add` instead of changing the list itself to an object (`edit`)
 ```
 $ jse example.json a highscore {score:52,user:charlie}
 ```
@@ -132,6 +132,35 @@ $ jse example.json a highscore {score:52,user:charlie}
     ]
 }
 ```
+first and last (or `^` and `$`) can also be used as a list index for any operation
+
+```
+$ jse example.json a users.first {name:jon,age:22,admin:false}
+```
+```json
+{
+    "users": [
+        {"name": "jon", "age": 22, "admin":false},
+        {"name": "bob", "age": 57, "admin": true},
+        {"name": "charlie", "age": 37, "admin": true}
+    ],
+    "highscore": [
+        {
+            "score": "32.5",
+            "user": "bob",
+            "metadata": {
+                "ip": "192.168.1.102",
+                "client": "firefox"
+            }
+        },
+        {
+            "score": 52.0,
+            "user": "charlie"
+        }
+    ]
+}
+```
+
 jse's error messages are informative, because no one wants a generic KeyError
 ```
 $ jse example.json a users.0.name "not bob"
