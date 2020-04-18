@@ -1,6 +1,5 @@
 language: python
 python:
-  - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
@@ -9,6 +8,7 @@ python:
 install:
   - pip install pipenv
   - pipenv install
+  - pipenv install pytest
 script:
   - pytest
 notifications:
