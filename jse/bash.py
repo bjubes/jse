@@ -16,7 +16,7 @@ def parse_value_from_bash(value):
         else:
             # the user passed {value} and bash has messed with it
             value = ",".join(value)          
-            value = "{{{}}}".format(value)
+            value = f"{{{value}}}"
             value = parse_value(value)
     except Exception as err:
         raise EditorError("too many arguments were passed or bash has preprocessed and mangled your input. Try putting VALUE in quotes.") from err
