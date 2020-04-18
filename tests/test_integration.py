@@ -112,9 +112,7 @@ def test_delete():
     }
 
 def test_list_regex_delete():
-    for exp in [('^','$'),('first','last'),("0","-1")]:
-        first = exp[0]
-        last = exp[1]
+    for first,last in zip(FIRST_EXPR,LAST_EXPR):
         obj = {
             "users": [
                 {"id": 1, "name": "mike"},
@@ -229,3 +227,25 @@ def test_errors_on_adding_list():
         subobj,key = query_object(obj,"list.1")
         add_func(subobj,key,"value")
     assert "has a value" in str(err.value)
+
+def test_regex_add():
+    for first,last in zip(FIRST_EXPR,LAST_EXPR):
+        obj = {'l':[3,4,5]}
+        subobj,key = query_object(obj,"l."+last)
+        add_func(subobj,key,6)
+        assert obj == {'l':[3,4,5,6]}
+
+        subobj,key = query_object(obj,"l."+first)
+        add_func(subobj,key,2)
+        assert obj == {'l':[2,3,4,5,6]}
+
+def test_regex_edit():
+    for first,last in zip(FIRST_EXPR,LAST_EXPR):
+        obj = {'l':[3,4,5]}
+        subobj,key = query_object(obj,"l."+last)
+        edit_func(subobj,key,6)
+        assert obj == {'l':[3,4,6]}
+
+        subobj,key = query_object(obj,"l."+first)
+        edit_func(subobj,key,2)
+        assert obj == {'l':[2,4,6]}

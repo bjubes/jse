@@ -1,6 +1,7 @@
 
 import sys
-
+FIRST_EXPR = ['first','^']
+LAST_EXPR = ['last','$']
 # use the query to find the sub object we have to modify
 def query_object(json,query):
     query = query.replace("]","").replace("[", ".").split(".")
@@ -12,9 +13,9 @@ def query_object(json,query):
             raise EditorError("'{}' doesn't exist. you can add it with --add".format(k)) from err
         except TypeError:
             try:
-                if k == "first" or k == "^":
+                if k in FIRST_EXPR:
                     k = 0
-                elif k == "last" or k == "$":
+                elif k in LAST_EXPR:
                     k = -1
                 obj = obj[int(k)]
             except IndexError as err:
@@ -84,18 +85,23 @@ def add_func(obj,key,value):
             obj[key].append(value)
             return
         #its not a list, so we are editing an existing value
-        raise EditorError("'{}' already has a value. Use --edit to modify it".format(key))
+        raise EditorError("'{}' already has a value. Use the edit command to modify it".format(key))
     except KeyError:
         # the key doesn't exist. this means add is valid
         obj[key] = value
-    except TypeError:
+    except TypeError as err:
         # this is a list
-        if int(key) == len(obj):
+        if key.lower() in LAST_EXPR:
+            obj.append(value)
+            return
+        if key.lower() in FIRST_EXPR:
+            obj.insert(0,value)
+        elif int(key) == len(obj):
             obj.append(value)
         elif int(key) < len(obj):
-            raise EditorError("'{}' already has a value. Use --edit to modify it".format(key))
+            raise EditorError("'{}' already has a value. Use the edit command to modify it".format(key)) from err
         else:
-            raise EditorError("the list only has {} elements. remove the index from your query to add to the end of this list automatically".format(len(obj)))
+            raise EditorError("the list only has {} elements. remove the index from your query to add to the end of this list automatically".format(len(obj))) from err
 
 
 def edit_func(obj,key,value):
@@ -107,6 +113,10 @@ def edit_func(obj,key,value):
         obj[key] = value
     except TypeError:
         try:
+            if key.lower() in FIRST_EXPR:
+                key = 0
+            elif key.lower() in LAST_EXPR:
+               key = -1
             obj[int(key)] = value
         except ValueError as err:
             raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
@@ -127,9 +137,9 @@ def delete_func(obj,key):
             raise EditorError("there is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
         except ValueError as err:
             # this is a list but we gave a non-integer as our key
-            if key == '^' or key == 'first':
+            if key.lower() in FIRST_EXPR:
                 del obj[0]
-            elif key == '$' or key == 'last':
+            elif key.lower() in LAST_EXPR:
                 del obj[-1]
             else:
                 raise EditorError("'{}' is not a valid list index.".format(key)) from err
