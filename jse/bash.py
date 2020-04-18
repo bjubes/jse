@@ -77,6 +77,9 @@ def parse_brackets_semetric(elements):
         fixed_input.append(obj)
     return fixed_input
 
+# parses a list of nested objects, assuming they have the same keys
+# it is not possibly (to my knowledge) to parse if the first key at least is not 
+# repeated in each object
 def parse_nested_object_list(elements):
     fixed_list = []
     elems = []

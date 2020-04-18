@@ -33,3 +33,16 @@ def test_bad_list_query():
         obj = {'a':[{},{}]}
         query_object(obj,'a.3.object')
     assert '3' in str(err.value)
+
+def test_first_last_list_query():
+    obj = {'l':[{'key':3},{'key':-1},{'key':4}]}
+    for exp in [('^','$'),('first','last'),("0","-1")]:
+        first,last = exp
+        subobj,key = query_object(obj,'l.{}.key'.format(first))
+        assert key == 'key'
+        assert subobj == {'key':3}
+
+        subobj,key = query_object(obj,'l.{}.key'.format(last))
+        assert key == 'key'
+        assert subobj == {'key':4}
+

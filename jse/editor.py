@@ -12,10 +12,15 @@ def query_object(json,query):
             raise EditorError("'{}' doesn't exist. you can add it with --add".format(k)) from err
         except TypeError:
             try:
+                if k == "first" or k == "^":
+                    k = 0
+                elif k == "last" or k == "$":
+                    k = -1
                 obj = obj[int(k)]
             except IndexError as err:
                 raise EditorError("there is no element with index {}. The largest index is {}".format(int(k),len(obj)-1)) from err
-
+            except ValueError as err:
+                raise EditorError("the key '{}' doesn't exist. you can add it with --add".format(k)) from err
     return obj, query[-1]
 
 # convert any value in string representation into a python object or standard type
