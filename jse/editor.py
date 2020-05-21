@@ -41,11 +41,11 @@ def parse_value(v):
     if v.lower() == "null":
         return None
     
-    if v[0] is '[' and v[-1] is ']':
+    if v[0] == '[' and v[-1] == ']':
         elems = split_on_root(v[1:-1],',')
         return [parse_value(e) for e in elems]
 
-    if v[0] is '{' and v[-1] is '}':
+    if v[0] == '{' and v[-1] == '}':
         if len(v.replace(" ","")) ==2:
             return {}
         obj = {}
