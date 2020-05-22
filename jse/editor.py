@@ -115,6 +115,9 @@ def edit_func(obj,key,value):
             if isinstance(obj,list):
                 raise TypeError
             elif key.lower() in ALL_EXPR:
+                if obj == {}:
+                    # the passed object is empty, so the key doesnt exist
+                    raise EditorError(f"cannot use '{key}' if no children exist")
                 for k in obj.keys():
                     obj[k] = value
                 return
@@ -127,11 +130,18 @@ def edit_func(obj,key,value):
             elif key.lower() in LAST_EXPR:
                key = -1
             elif key.lower() in ALL_EXPR:
-                for k in obj.keys():
-                    obj[k] = value
-                return
+                try:
+                    for k in obj.keys():
+                        obj[k] = value
+                    return
+                except AttributeError as err:
+                    #obj.keys() failed bc obj isn't a dict.
+                    raise EditorError(f"cannot use '{key}' if parent is not an object") from err
             obj[int(key)] = value
         except IndexError as err:
+            if len(obj) == 0:
+                obj.append(value)
+                return
             raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
 
 def delete_func(obj,key):
@@ -139,6 +149,9 @@ def delete_func(obj,key):
         del obj[key]
     except KeyError as err:
         if key.lower() in ALL_EXPR:
+            if obj == {}:
+                # the passed object is empty, so the key doesnt exist
+                raise EditorError(f"cannot use '{key}' if parent has no children") from err
             for k in list(obj.keys()):
                 del obj[k]
             return
