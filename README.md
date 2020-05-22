@@ -9,15 +9,15 @@ jse is pragmatic and terse. It lets you edit json fast, without needing to care 
 $ jse FILE COMMAND QUERY VALUE
 ```
 #### TLDR Version
-edit an existing key: ``` e edit```
+edit an existing key: `e` or `edit`
 ```
 $ jse config.json edit app.version 0.3.3
 ```
-add a new element: ``` a add```
+add a new element: `a` or `add`
 ```
 $ jse todo.json add list.shopping {task:eggs,done:false}
 ```
-delete a value: ``` d delete```
+delete a value: `d` or `delete`
 ```
 $ jse problems.json delete problems[99]
 ```
@@ -54,7 +54,7 @@ Assume we have this json file
 }
 ```
 
-We want to delete the user alice using jse. All we need to do is specify `-d` or `--delete` mode and the path to her `user` object
+We want to delete the user alice using jse. All we need to do is specify `d` or `delete` mode and the path to her `user` object
 ```
 $ jse example.json d users[0]
 ```
