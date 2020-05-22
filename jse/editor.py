@@ -22,6 +22,8 @@ def query_object(json,query):
                     k = 0
                 elif k in LAST_EXPR:
                     k = -1
+                elif k in ALL_EXPR:
+                    return [query_object(obj, str(l) + "." +".".join(query[i+1:])) for l in range(len(obj))],None
                 obj = obj[int(k)]
             except IndexError as err:
                 raise EditorError("there is no element with index {}. The largest index is {}".format(int(k),len(obj)-1)) from err
