@@ -6,7 +6,7 @@ import click
 from .editor import *
 from .bash import *
 
-VERSION = "0.0.8"
+VERSION = "0.1.0"
 
 class AliasedGroup(click.Group):
     def get_command(self, ctx, cmd_name):
