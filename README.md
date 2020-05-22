@@ -30,7 +30,7 @@ pip3 install jse
 ```
 
 ### Running from Source
-Requiremets:
+Requirements:
 - Python 3.7
 
 Steps:
