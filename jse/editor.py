@@ -114,6 +114,10 @@ def edit_func(obj,key,value):
         if key not in obj:
             if isinstance(obj,list):
                 raise TypeError
+            elif key.lower() in ALL_EXPR:
+                for k in obj.keys():
+                    obj[k] = value
+                return
             raise EditorError(f"'{key}' doesn't exist. you can add it with --add")
         obj[key] = value
     except TypeError:
