@@ -2,14 +2,19 @@
 import sys
 FIRST_EXPR = ['first','^']
 LAST_EXPR = ['last','$']
+ALL_EXPR = ['all','*']
 # use the query to find the sub object we have to modify
+# returns an obj and its query OR
+# a list of obj-query pairs and None
 def query_object(json,query):
     query = query.replace("]","").replace("[", ".").split(".")
     obj = json
-    for k in query[:-1]:
+    for i,k in enumerate(query[:-1]):
         try:
             obj = obj[k]
         except KeyError as err:
+            if k in ALL_EXPR:
+                return [query_object(obj,q  + "." +".".join(query[i+1:])) for q in obj.keys()],None
             raise EditorError(f"'{k}' doesn't exist. you can add it with --add") from err
         except TypeError:
             try:
@@ -17,6 +22,8 @@ def query_object(json,query):
                     k = 0
                 elif k in LAST_EXPR:
                     k = -1
+                elif k in ALL_EXPR:
+                    return [query_object(obj, str(l) + "." +".".join(query[i+1:])) for l in range(len(obj))],None
                 obj = obj[int(k)]
             except IndexError as err:
                 raise EditorError(f"there is no element with index {k}. The largest index is {len(obj)-1}") from err
@@ -107,6 +114,13 @@ def edit_func(obj,key,value):
         if key not in obj:
             if isinstance(obj,list):
                 raise TypeError
+            elif key.lower() in ALL_EXPR:
+                if obj == {}:
+                    # the passed object is empty, so the key doesnt exist
+                    raise EditorError(f"cannot use '{key}' if no children exist")
+                for k in obj.keys():
+                    obj[k] = value
+                return
             raise EditorError(f"'{key}' doesn't exist. you can add it with --add")
         obj[key] = value
     except TypeError:
@@ -115,15 +129,32 @@ def edit_func(obj,key,value):
                 key = 0
             elif key.lower() in LAST_EXPR:
                key = -1
+            elif key.lower() in ALL_EXPR:
+                for k in obj.keys():
+                    obj[k] = value
+                return
             obj[int(key)] = value
         except IndexError as err:
+            if len(obj) == 0:
+                obj.append(value)
+                return
             raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
+    except AttributeError as err:
+        #obj.keys() failed bc obj isn't a dict.
+        raise EditorError(f"cannot use '{key}' if parent is not an object") from err
 
 def delete_func(obj,key):
     try:
         del obj[key]
     except KeyError as err:
-       raise EditorError(f"'{key}' doesn't exist.") from err
+        if key.lower() in ALL_EXPR:
+            if obj == {}:
+                # the passed object is empty, so the key doesnt exist
+                raise EditorError(f"cannot use '{key}' if parent has no children") from err
+            for k in list(obj.keys()):
+                del obj[k]
+            return
+        raise EditorError(f"'{key}' doesn't exist.") from err
     except:
         try:
             del obj[int(key)]
@@ -137,6 +168,13 @@ def delete_func(obj,key):
                 del obj[0]
             elif key.lower() in LAST_EXPR:
                 del obj[-1]
+            elif key.lower() in ALL_EXPR:
+                try:
+                    for k in list(obj.keys()):
+                        del obj[k]
+                except AttributeError as err:
+                    #obj.keys() failed bc obj isn't a dict.
+                    raise EditorError(f"cannot use '{key}' if parent is not an object") from err
             else:
                 raise EditorError(f"'{key}' is not a valid list index.") from err
 

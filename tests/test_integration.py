@@ -264,3 +264,89 @@ def test_equals_in_args():
     # '=' in a value should not raise an error
     parse_value_from_bash(['[a:1]', '[b:2]', '[c:3]'])
     assert True
+
+def test_star_key_edit():
+    for all_op in ALL_EXPR:
+        obj = {'root':{'a':[3,4,5],'b':3,'c':'string'}}
+        sub,key = query_object(obj,"root."+ all_op)
+        edit_func(sub,key,3)
+        assert obj == {'root':{'a':3,'b':3,'c':3}}
+
+def test_star_query_add():
+    for all_op in ALL_EXPR:
+        obj = {'root':{'a':{},'b':{'existing':True}}}
+        subkeypairs,none_obj = query_object(obj,"root."+ all_op +".key")
+        assert none_obj == None
+        for sub,key in subkeypairs:
+            add_func(sub,key,3)
+        assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True}}}
+
+
+def test_star_query_edit():
+    for all_op in ALL_EXPR:
+        obj = {'root':{'a':{"key":3},'b':{"key":3,'existing':True}}}
+        subkeypairs,none_obj = query_object(obj,"root."+ all_op +".key")
+        assert none_obj == None
+        for sub,key in subkeypairs:
+            edit_func(sub,key,-1)
+        assert obj == {'root':{'a':{"key":-1},'b':{"key":-1,'existing':True}}}
+
+
+
+def test_star_query_delete():
+    for all_op in ALL_EXPR:
+        obj = {'root':{'a':{"key":3},'b':{"key":3,'existing':True}}}
+        subkeypairs,none_obj = query_object(obj,"root."+ all_op +".key")
+        assert none_obj == None
+        for sub,key in subkeypairs:
+            delete_func(sub,key)
+        assert obj == {'root':{'a':{},'b':{'existing':True}}}
+
+
+def test_star_query_with_conflicting_keyword():
+    for all_op in ('all','*'):
+        obj = {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':4},'*':{'key':5}}}
+        sub,key = query_object(obj,"root."+ all_op +".key")
+    
+        edit_func(sub,key,{})
+        if all_op == '*':
+            assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':4},'*':{'key':{}}}}
+        if all_op == 'all':
+            assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':{}},'*':{'key':5}}}
+
+
+def test_star_fails_when_no_children():
+    obj = {'root':{'a':{},'b':{}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                delete_func(sub,key)
+            
+    obj = {'root':{'a':{},'b':{}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                edit_func(sub,key,"value")
+               
+
+def test_star_fails_when_child_not_object():
+    obj = {'root':{'a':{3},'b':{3}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                delete_func(sub,key)
+            
+    obj = {'root':{'a':{3},'b':{3}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                edit_func(sub,key,"value")
+               

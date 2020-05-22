@@ -46,3 +46,27 @@ def test_first_last_list_query():
         assert key == 'key'
         assert subobj == {'key':4}
 
+def test_all_query_basic_dict():
+    obj = {'a': {
+        'ah':{'inner':1},
+        'b':{'inner':2},
+        'c':{'inner':3}
+    }}
+    pairs, noneval = query_object(obj,'a.*.inner')
+    assert noneval == None
+    assert pairs[0] == ({'inner':1}, 'inner')
+    assert pairs[1] == ({'inner':2}, 'inner')
+    assert pairs[2] == ({'inner':3}, 'inner')
+
+def test_all_query_basic_list():
+    obj = {'a': [
+        {'inner':1},
+        {'inner':2},
+        {'inner':3}]
+    }
+    pairs, noneval = query_object(obj,'a.*.inner')
+    assert noneval == None
+    assert pairs[0] == ({'inner':1}, 'inner')
+    assert pairs[1] == ({'inner':2}, 'inner')
+    assert pairs[2] == ({'inner':3}, 'inner')
+

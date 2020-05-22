@@ -1,0 +1,11 @@
+{
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "editor.find.addExtraSpaceOnTop": false,
+    "terminal.integrated.mouseWheelScrollSensitivity": 0.2,
+    "terminal.integrated.fastScrollSensitivity": 1
+}
