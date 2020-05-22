@@ -170,8 +170,12 @@ def delete_func(obj,key):
             elif key.lower() in LAST_EXPR:
                 del obj[-1]
             elif key.lower() in ALL_EXPR:
-                for k in list(obj.keys()):
-                    del obj[k]
+                try:
+                    for k in list(obj.keys()):
+                        del obj[k]
+                except AttributeError as err:
+                    #obj.keys() failed bc obj isn't a dict.
+                    raise EditorError(f"cannot use '{key}' if parent is not an object") from err
             else:
                 raise EditorError(f"'{key}' is not a valid list index.") from err
 
