@@ -1,4 +1,4 @@
-# jse - JSON Editor [![Build Status](https://travis-ci.org/bjubes/jse.svg?branch=master)](https://travis-ci.org/bjubes/jse)
+# jse - JSON Editor [![Build Status](https://travis-ci.org/bjubes/jse.svg?branch=master)](https://travis-ci.org/bjubes/jse) [![Coverage Status](https://coveralls.io/repos/github/bjubes/jse/badge.svg?branch=master)](https://coveralls.io/github/bjubes/jse?branch=master)
 
 
 quickly edit json files from the command line

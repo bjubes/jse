@@ -15,7 +15,7 @@ def query_object(json,query):
         except KeyError as err:
             if k in ALL_EXPR:
                 return [query_object(obj,q  + "." +".".join(query[i+1:])) for q in obj.keys()],None
-            raise EditorError("'{}' doesn't exist. you can add it with --add".format(k)) from err
+            raise EditorError(f"'{k}' doesn't exist. you can add it with --add") from err
         except TypeError:
             try:
                 if k in FIRST_EXPR:
@@ -26,9 +26,7 @@ def query_object(json,query):
                     return [query_object(obj, str(l) + "." +".".join(query[i+1:])) for l in range(len(obj))],None
                 obj = obj[int(k)]
             except IndexError as err:
-                raise EditorError("there is no element with index {}. The largest index is {}".format(int(k),len(obj)-1)) from err
-            except ValueError as err:
-                raise EditorError("the key '{}' doesn't exist. you can add it with --add".format(k)) from err
+                raise EditorError(f"there is no element with index {k}. The largest index is {len(obj)-1}") from err
     return obj, query[-1]
 
 # convert any value in string representation into a python object or standard type
@@ -53,7 +51,11 @@ def parse_value(v):
         return [parse_value(e) for e in elems]
 
     if v[0] == '{' and v[-1] == '}':
+<<<<<<< HEAD
         if len(v.replace(" ","")) ==2:
+=======
+        if len(v.replace(" ","")) == 2:
+>>>>>>> master
             return {}
         obj = {}
         elems = split_on_root(v[1:-1],',')
@@ -92,7 +94,7 @@ def add_func(obj,key,value):
             obj[key].append(value)
             return
         #its not a list, so we are editing an existing value
-        raise EditorError("'{}' already has a value. Use the edit command to modify it".format(key))
+        raise EditorError(f"'{key}' already has a value. Use the edit command to modify it")
     except KeyError:
         # the key doesn't exist. this means add is valid
         obj[key] = value
@@ -106,17 +108,17 @@ def add_func(obj,key,value):
         elif int(key) == len(obj):
             obj.append(value)
         elif int(key) < len(obj):
-            raise EditorError("'{}' already has a value. Use the edit command to modify it".format(key)) from err
+            raise EditorError(f"'{key}' already has a value. Use the edit command to modify it") from err
         else:
-            raise EditorError("the list only has {} elements. remove the index from your query to add to the end of this list automatically".format(len(obj))) from err
+            raise EditorError(f"the list only has {len(obj)} elements. remove the index from your query to add to the end of this list automatically") from err
 
 
 def edit_func(obj,key,value):
     try:
         if key not in obj:
-            if isinstance(obj) == list:
+            if isinstance(obj,list):
                 raise TypeError
-            raise EditorError("'{}' doesn't exist. you can add it with --add".format(key))
+            raise EditorError(f"'{key}' doesn't exist. you can add it with --add")
         obj[key] = value
     except TypeError:
         try:
@@ -129,27 +131,29 @@ def edit_func(obj,key,value):
                     obj[k] = value
                 return
             obj[int(key)] = value
-        except ValueError as err:
-            raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
         except IndexError as err:
-            raise EditorError("there is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
+            raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
 
 def delete_func(obj,key):
     try:
         del obj[key]
     except KeyError as err:
+<<<<<<< HEAD
         if key.lower() in ALL_EXPR:
             for k in list(obj.keys()):
                 del obj[k]
             return
         raise EditorError("'{}' doesn't exist.".format(key)) from err
+=======
+       raise EditorError(f"'{key}' doesn't exist.") from err
+>>>>>>> master
     except:
         try:
             del obj[int(key)]
         except IndexError as err:
             if len(obj) == 0:
                 raise EditorError("the list is already empty") from err
-            raise EditorError("there is no element with index {}. The largest index is {}".format(int(key),len(obj)-1)) from err
+            raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
         except ValueError as err:
             # this is a list but we gave a non-integer as our key
             if key.lower() in FIRST_EXPR:
@@ -160,8 +164,7 @@ def delete_func(obj,key):
                 for k in list(obj.keys()):
                     del obj[k]
             else:
-                raise EditorError("'{}' is not a valid list index.".format(key)) from err
-
+                raise EditorError(f"'{key}' is not a valid list index.") from err
 
 class EditorError(Exception):
     pass

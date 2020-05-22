@@ -38,11 +38,11 @@ def test_first_last_list_query():
     obj = {'l':[{'key':3},{'key':-1},{'key':4}]}
     for exp in [('^','$'),('first','last'),("0","-1")]:
         first,last = exp
-        subobj,key = query_object(obj,'l.{}.key'.format(first))
+        subobj,key = query_object(obj,f'l.{first}.key')
         assert key == 'key'
         assert subobj == {'key':3}
 
-        subobj,key = query_object(obj,'l.{}.key'.format(last))
+        subobj,key = query_object(obj,f'l.{last}.key')
         assert key == 'key'
         assert subobj == {'key':4}
 

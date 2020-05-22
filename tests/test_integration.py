@@ -169,6 +169,12 @@ def test_edit_non_existing_key():
         edit_func(subobj,key,"new value")
     assert "nameofthekey" in str(err.value)
 
+def test_edit_non_list_index_out_of_range():
+    with pytest.raises(EditorError) as err:
+        obj = [1,2]
+        subobj,key = query_object(obj,"3")
+        edit_func(subobj,key,"new value")
+
 
 def test_delete_non_existing_key():
     obj = {'a': {'sub1':0,'sub2':1}}
@@ -249,3 +255,12 @@ def test_regex_edit():
         subobj,key = query_object(obj,"l."+first)
         edit_func(subobj,key,2)
         assert obj == {'l':[2,4,6]}
+
+def test_equals_in_args():    
+    with pytest.raises(EditorError) as err:
+        parse_value_from_bash(('=','value'))
+    assert "=" in str(err.value)
+
+    # '=' in a value should not raise an error
+    parse_value_from_bash(['[a:1]', '[b:2]', '[c:3]'])
+    assert True
