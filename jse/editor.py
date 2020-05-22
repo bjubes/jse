@@ -130,19 +130,18 @@ def edit_func(obj,key,value):
             elif key.lower() in LAST_EXPR:
                key = -1
             elif key.lower() in ALL_EXPR:
-                try:
-                    for k in obj.keys():
-                        obj[k] = value
-                    return
-                except AttributeError as err:
-                    #obj.keys() failed bc obj isn't a dict.
-                    raise EditorError(f"cannot use '{key}' if parent is not an object") from err
+                for k in obj.keys():
+                    obj[k] = value
+                return
             obj[int(key)] = value
         except IndexError as err:
             if len(obj) == 0:
                 obj.append(value)
                 return
             raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
+    except AttributeError as err:
+        #obj.keys() failed bc obj isn't a dict.
+        raise EditorError(f"cannot use '{key}' if parent is not an object") from err
 
 def delete_func(obj,key):
     try:

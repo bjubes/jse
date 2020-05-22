@@ -313,3 +313,40 @@ def test_star_query_with_conflicting_keyword():
             assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':4},'*':{'key':{}}}}
         if all_op == 'all':
             assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':{}},'*':{'key':5}}}
+
+
+def test_star_fails_when_no_children():
+    obj = {'root':{'a':{},'b':{}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                delete_func(sub,key)
+            
+    obj = {'root':{'a':{},'b':{}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                edit_func(sub,key,"value")
+               
+
+def test_star_fails_when_child_not_object():
+    obj = {'root':{'a':{3},'b':{3}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                delete_func(sub,key)
+            
+    obj = {'root':{'a':{3},'b':{3}}}
+    for all_op in ALL_EXPR:
+        with pytest.raises(EditorError) as err:
+            subkeypairs,none_obj = query_object(obj,"root."+ all_op +"."+all_op)
+            assert none_obj == None
+            for sub,key in subkeypairs:
+                edit_func(sub,key,"value")
+               
