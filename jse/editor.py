@@ -51,11 +51,7 @@ def parse_value(v):
         return [parse_value(e) for e in elems]
 
     if v[0] == '{' and v[-1] == '}':
-<<<<<<< HEAD
-        if len(v.replace(" ","")) ==2:
-=======
         if len(v.replace(" ","")) == 2:
->>>>>>> master
             return {}
         obj = {}
         elems = split_on_root(v[1:-1],',')
@@ -138,15 +134,11 @@ def delete_func(obj,key):
     try:
         del obj[key]
     except KeyError as err:
-<<<<<<< HEAD
         if key.lower() in ALL_EXPR:
             for k in list(obj.keys()):
                 del obj[k]
             return
-        raise EditorError("'{}' doesn't exist.".format(key)) from err
-=======
-       raise EditorError(f"'{key}' doesn't exist.") from err
->>>>>>> master
+        raise EditorError(f"'{key}' doesn't exist.") from err
     except:
         try:
             del obj[int(key)]
