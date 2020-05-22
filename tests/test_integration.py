@@ -301,3 +301,15 @@ def test_star_query_delete():
         for sub,key in subkeypairs:
             delete_func(sub,key)
         assert obj == {'root':{'a':{},'b':{'existing':True}}}
+
+
+def test_star_query_with_conflicting_keyword():
+    for all_op in ('all','*'):
+        obj = {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':4},'*':{'key':5}}}
+        sub,key = query_object(obj,"root."+ all_op +".key")
+    
+        edit_func(sub,key,{})
+        if all_op == '*':
+            assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':4},'*':{'key':{}}}}
+        if all_op == 'all':
+            assert obj == {'root':{'a':{"key":3},'b':{"key":3,'existing':True},'all':{'key':{}},'*':{'key':5}}}

@@ -96,8 +96,8 @@ def delete(file,query,preview,debug):
                 obj,key = query_object(json_obj,q)
                 if key == None:
                     # multiple returns
-                    for o,key in obj:
-                        delete_func(o,key)    
+                    for o,k in obj:
+                        delete_func(o,k)    
                 else:
                     delete_func(obj,key)
             if preview:

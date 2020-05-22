@@ -133,6 +133,3 @@ dmypy.json
 
 # json file for testing
 example.json
-
-# ignore vscode settings for now
-.vscode/
