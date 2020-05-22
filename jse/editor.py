@@ -2,14 +2,19 @@
 import sys
 FIRST_EXPR = ['first','^']
 LAST_EXPR = ['last','$']
+ALL_EXPR = ['all','*']
 # use the query to find the sub object we have to modify
+# returns an obj and its query OR
+# a list of obj-query pairs and None
 def query_object(json,query):
     query = query.replace("]","").replace("[", ".").split(".")
     obj = json
-    for k in query[:-1]:
+    for i,k in enumerate(query[:-1]):
         try:
             obj = obj[k]
         except KeyError as err:
+            if k in ALL_EXPR:
+                return [query_object(obj,q  + "." +".".join(query[i+1:])) for q in obj.keys()],None
             raise EditorError("'{}' doesn't exist. you can add it with --add".format(k)) from err
         except TypeError:
             try:
@@ -117,6 +122,10 @@ def edit_func(obj,key,value):
                 key = 0
             elif key.lower() in LAST_EXPR:
                key = -1
+            elif key.lower() in ALL_EXPR:
+                for k in obj.keys():
+                    obj[k] = value
+                return
             obj[int(key)] = value
         except ValueError as err:
             raise EditorError("'{}' doesn't exist. you can add it with --add".format(key)) from err
@@ -127,7 +136,11 @@ def delete_func(obj,key):
     try:
         del obj[key]
     except KeyError as err:
-       raise EditorError("'{}' doesn't exist.".format(key)) from err
+        if key.lower() in ALL_EXPR:
+            for k in list(obj.keys()):
+                del obj[k]
+            return
+        raise EditorError("'{}' doesn't exist.".format(key)) from err
     except:
         try:
             del obj[int(key)]
@@ -141,6 +154,9 @@ def delete_func(obj,key):
                 del obj[0]
             elif key.lower() in LAST_EXPR:
                 del obj[-1]
+            elif key.lower() in ALL_EXPR:
+                for k in list(obj.keys()):
+                    del obj[k]
             else:
                 raise EditorError("'{}' is not a valid list index.".format(key)) from err
 

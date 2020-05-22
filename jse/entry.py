@@ -39,7 +39,12 @@ def add(file,query,value,preview,debug):
         with open(file,'r+') as f:
             json_obj = json.load(f)         
             obj,key = query_object(json_obj,query)
-            add_func(obj,key,value)
+            if key == None:
+                # multiple returns
+                for o,key in obj:
+                    add_func(o,key,value)    
+            else:
+                add_func(obj,key,value)
             if preview:
                 print(json.dumps(json_obj,indent=4))
                 return
@@ -62,7 +67,13 @@ def edit(file,query,value,preview,debug):
         with open(file,'r+') as f:
             json_obj = json.load(f)         
             obj,key = query_object(json_obj,query)
-            edit_func(obj,key,value)
+            print(obj)
+            if key == None:
+                # multiple returns
+                for o,key in obj:
+                    edit_func(o,key,value)    
+            else:
+                edit_func(obj,key,value)
             if preview:
                 print(json.dumps(json_obj,indent=4))
                 return
@@ -84,7 +95,12 @@ def delete(file,query,preview,debug):
             json_obj = json.load(f)       
             for q in query:
                 obj,key = query_object(json_obj,q)
-                delete_func(obj,key)
+                if key == None:
+                    # multiple returns
+                    for o,key in obj:
+                        delete_func(o,key)    
+                else:
+                    delete_func(obj,key)
             if preview:
                 print(json.dumps(json_obj,indent=4))
                 return
