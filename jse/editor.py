@@ -130,8 +130,8 @@ def edit_func(obj,key,value):
             elif key.lower() in LAST_EXPR:
                key = -1
             elif key.lower() in ALL_EXPR:
-                for k in obj.keys():
-                    obj[k] = value
+                for i in range(len(obj)):
+                    obj[i]= value
                 return
             obj[int(key)] = value
         except IndexError as err:

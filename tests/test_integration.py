@@ -349,7 +349,8 @@ def test_star_fails_when_child_not_object():
             assert none_obj == None
             for sub,key in subkeypairs:
                 edit_func(sub,key,"value")
-               
+
+
 def test_edit_empty_list():
     obj = {'root' : [] }
     sub,key = query_object(obj,"root.0")
@@ -361,3 +362,15 @@ def test_edit_empty_list():
         sub,key = query_object(obj,"root.1")
         edit_func(sub,key,"val")
     assert 'index' in str(err)
+
+
+def edit_list_with_ending_star():
+    obj = {'root' : {'a': [1,2,3]}}
+    sub,key = query_object(obj,"root.a.*")
+    edit_func(sub,key,"val")
+    assert obj == {'root' : {'a': ["val","val","val"]}}
+
+    obj = {'root' : {'a': []}}
+    sub,key = query_object(obj,"root.a.*")
+    edit_func(sub,key,"val")
+    assert obj == {'root' : {'a': []}}
