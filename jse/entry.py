@@ -8,6 +8,8 @@ from .bash import *
 
 VERSION = "0.1.1"
 
+# AliasedGroup allows commands to be shortened, so 'd', 'del', and 'delete'
+# can all be used for the delete sub command
 class AliasedGroup(click.Group):
     def get_command(self, ctx, cmd_name):
         rv = click.Group.get_command(self, ctx, cmd_name)
@@ -46,14 +48,12 @@ def add(file,query,value,preview,debug):
             else:
                 add_func(obj,key,value)
             if preview:
-                print(json.dumps(json_obj,indent=4))
+                click.echo(json.dumps(json_obj,indent=4))
                 return
             save_json(f,json_obj)
     except EditorError as err:
-            print_err(err)
-            if debug:
-                print("Debug enabled. Stack Trace:\n")
-                raise err
+        handle_error(err,debug)
+
 
 @main.command(short_help='change an existing key to a new value')
 @click.argument('query')
@@ -74,14 +74,12 @@ def edit(file,query,value,preview,debug):
             else:
                 edit_func(obj,key,value)
             if preview:
-                print(json.dumps(json_obj,indent=4))
+                click.echo(json.dumps(json_obj,indent=4))
                 return
             save_json(f,json_obj)
     except EditorError as err:
-        print_err(err)
-        if debug:
-            print("Debug enabled. Stack Trace:\n")
-            raise err
+        handle_error(err,debug)
+
 
 @main.command(short_help='delete an element')
 @click.argument('query', nargs=-1)
@@ -101,22 +99,25 @@ def delete(file,query,preview,debug):
                 else:
                     delete_func(obj,key)
             if preview:
-                print(json.dumps(json_obj,indent=4))
+                click.echo(json.dumps(json_obj,indent=4))
                 return
             save_json(f,json_obj)
     except EditorError as err:
-        print_err(err)
-        if debug:
-            print("Debug enabled. Stack Trace:\n")
-            raise err
+       handle_error(err,debug)
 
 def save_json(f, json_obj):
         f.seek(0)
         f.truncate()
         json.dump(json_obj,f,indent=4)
 
-def print_err(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+def print_err(err):
+    click.echo(click.style(str(err),fg='bright_red'),file=sys.stderr)
+
+def handle_error(err,debug):
+    print_err(err)
+    if debug:
+        print_err("\nDebug enabled. Stack Trace:")
+        raise err
 
 
 if __name__ == '__main__':
