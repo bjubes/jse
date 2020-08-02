@@ -364,7 +364,7 @@ def test_edit_empty_list():
     assert 'index' in str(err)
 
 
-def edit_list_with_ending_star():
+def test_edit_list_with_ending_star():
     obj = {'root' : {'a': [1,2,3]}}
     sub,key = query_object(obj,"root.a.*")
     edit_func(sub,key,"val")
