@@ -171,9 +171,9 @@ $ jse example.json d users[2]
 There is no element with index 2. The largest index is 1
 ```
 
-You can also delete mulitple keys using -d, by passing them seperately
+You can also delete mulitple keys by passing them seperately
 ```
-$ jse example.json d users.first.age users.1.age users.2.age
+$ jse example.json d users.0.age users.1.age users.2.age
 ```
 ```json
 {
@@ -194,7 +194,7 @@ $ jse example.json d users.first.age users.1.age users.2.age
     ...
 }
 ```
-boy, that was a lot of typing. Good thing jse has an all operator (`*`)
+If you want to select every element, use the  `*` or `all` operator
 ```shell
-$ jse example.json d users.*.age #users.all.age also works
+$ jse example.json d users.*.age # or users.all.age
 ```
