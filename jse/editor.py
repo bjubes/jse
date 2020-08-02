@@ -135,7 +135,7 @@ def edit_func(obj,key,value):
                 return
             obj[int(key)] = value
         except IndexError as err:
-            if len(obj) == 0:
+            if len(obj) == 0 and int(key) == 0:
                 obj.append(value)
                 return
             raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
