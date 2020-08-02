@@ -130,12 +130,12 @@ def edit_func(obj,key,value):
             elif key.lower() in LAST_EXPR:
                key = -1
             elif key.lower() in ALL_EXPR:
-                for k in obj.keys():
-                    obj[k] = value
+                for i in range(len(obj)):
+                    obj[i]= value
                 return
             obj[int(key)] = value
         except IndexError as err:
-            if len(obj) == 0:
+            if len(obj) == 0 and int(key) == 0:
                 obj.append(value)
                 return
             raise EditorError(f"there is no element with index {key}. The largest index is {len(obj)-1}") from err
