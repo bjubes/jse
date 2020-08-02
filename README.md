@@ -31,15 +31,16 @@ pip3 install jse
 
 ### Running from Source
 Requirements:
-- Python 3.7
+- Python 3.7+
+- [Click](https://pypi.org/project/click/)
 
 Steps:
 1. clone the repository
-2. make the run script executable `chmod +x run.py`
-3. place jse on the path `ln -s /path/to/run.py ~/.local/bin/jse`
+2. install click `pip3 install click`
+3. make the run script executable `chmod +x run.py`
+4. place jse on the path `ln -s /path/to/run.py ~/.local/bin/jse`
 
-jse has no runtime dependencies, but does use pytest for tests.
-
+using pipenv is recommended if you plan to contribute
 
 ## Examples
 Assume we have this json file
