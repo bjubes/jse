@@ -40,7 +40,11 @@ Steps:
 3. make the run script executable `chmod +x run.py`
 4. place jse on the path `ln -s /path/to/run.py ~/.local/bin/jse`
 
-using pipenv is recommended if you plan to contribute
+using poetry is recommended if you plan to contribute
+```
+pip3 install poetry
+poetry shell 
+```
 
 ## Examples
 Assume we have this json file
