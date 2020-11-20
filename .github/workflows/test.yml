@@ -20,14 +20,13 @@ jobs:
         pip install poetry
         poetry config virtualenvs.create false
         poetry install
-        pip install pytest-cov coveralls
+        pip install pytest-cov
     - name: Run Tests
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        pytest --cov=jse
-        coveralls
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
+        pytest --cov=jse --cov-report=xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+         file: ./coverage.xml
