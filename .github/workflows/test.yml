@@ -21,4 +21,9 @@ jobs:
         poetry install
     - name: Run Tests
       run: |
-        poetry run pytest
+        poetry run pytest --cov=jse
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+      
