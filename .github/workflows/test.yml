@@ -22,12 +22,12 @@ jobs:
         poetry install
         pip install pytest-cov coveralls
     - name: Run Tests
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         pytest --cov=jse
         coveralls --output=coverage.json
     - name: Coveralls
-      env: 
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
