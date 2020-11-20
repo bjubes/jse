@@ -1,11 +1,9 @@
 name: Upload to PyPi
 
-# on:
-#   release:
-#     types: [created]
-
-on: [workflow_dispatch]
-
+on:
+  release:
+    types: [created]
+    
 jobs:
   deploy:
     runs-on: ubuntu-latest
