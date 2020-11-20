@@ -6,7 +6,7 @@ import click
 from .editor import *
 from .bash import *
 
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 # AliasedGroup allows commands to be shortened, so 'd', 'del', and 'delete'
 # can all be used for the delete sub command
