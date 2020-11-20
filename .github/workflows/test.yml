@@ -24,8 +24,10 @@ jobs:
     - name: Run Tests
       run: |
         pytest --cov=jse
+        coveralls --output=coverage.json
     - name: Coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./coverage.json
       
