@@ -1,4 +1,4 @@
-# jse - JSON Editor [![codecov](https://codecov.io/gh/bjubes/jse/branch/master/graph/badge.svg)](https://codecov.io/gh/bjubes/jse)
+# jse - JSON Editor ![build status](https://github.com/bjubes/jse/actions/workflows/test.yml/badge.svg) [![codecov](https://codecov.io/gh/bjubes/jse/branch/master/graph/badge.svg)](https://codecov.io/gh/bjubes/jse)
 
 quickly edit json files from the command line
 
@@ -47,7 +47,7 @@ $ poetry shell
 ```
 
 ## Examples
-Assume we have this json file
+Assume this json file is in the current directory
 ```json
 # example.json
 {
@@ -59,7 +59,7 @@ Assume we have this json file
 }
 ```
 
-We want to delete the user alice using jse. All we need to do is specify `d` or `delete` mode and the path to her `user` object
+To delete the user alice using jse, all we need to do is specify `d` or `delete` mode and the path to her `user` object
 ```
 $ jse example.json d users[0]
 ```
@@ -76,7 +76,7 @@ $ jse example.json d users.0   #users.first or users.^ also work
     ]
 }
 ```
-Now lets make charlie an admin. To edit an existing field we use the edit command with `e` or `edit`. Edit takes a key to change and its new value.
+Now lets make charlie an admin. To edit an existing field, use the edit command with `e` or `edit`. Edit takes a key to change and its new value.
 ```
 $ jse example.json e users.1.admin true
 ```
@@ -111,7 +111,7 @@ $ jse example.json a highscore [{score:32.5,user:bob,metadata:{ip:192.168.1.102,
     ]
 }
 ```
-jse also understands lists, so we can add new elements to one without needing an explicit index. It will infer we are trying to append from `add` instead of changing the list itself to an object (`edit`)
+jse also understands lists, so you can add new elements to one without needing an explicit index. It will infer we are trying to append from `add` instead of changing the list itself to an object (`edit`)
 ```
 $ jse example.json a highscore {score:52,user:charlie}
 ```
@@ -176,8 +176,8 @@ $ jse example.json d users[2]
 There is no element with index 2. The largest index is 1
 ```
 
-You can also delete mulitple keys by passing them seperately
-```
+You can also delete mulitple keys in one command
+``
 $ jse example.json d users.0.age users.1.age users.2.age
 ```
 ```json
@@ -199,7 +199,7 @@ $ jse example.json d users.0.age users.1.age users.2.age
     ...
 }
 ```
-If you want to select every element, use the  `*` or `all` operator
+No need to specify every element, just use the  `*` or `all` operator
 ```shell
 $ jse example.json d users.*.age # or users.all.age
 ```
