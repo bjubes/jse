@@ -47,7 +47,7 @@ def add(file, query, value, preview, debug):
         with open(file, 'r+') as f:
             json_obj = json.load(f)
             obj, key = query_object(json_obj, query)
-            if key == None:
+            if key is None:
                 # multiple returns
                 for o, key in obj:
                     add_func(o, key, value)
