@@ -1,4 +1,4 @@
-# jse - JSON Editor [![build status](https://github.com/bjubes/jse/actions/workflows/test.yml/badge.svg)](https://github.com/bjubes/jse/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/bjubes/jse/branch/master/graph/badge.svg)](https://codecov.io/gh/bjubes/jse)
+# jse - JSON Editor [![PyPi](https://img.shields.io/pypi/v/jse)](https://pypi.org/project/jse/) [![build status](https://github.com/bjubes/jse/actions/workflows/test.yml/badge.svg)](https://github.com/bjubes/jse/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/bjubes/jse/branch/master/graph/badge.svg)](https://codecov.io/gh/bjubes/jse)
 
 quickly edit json files from the command line
 
