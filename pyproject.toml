@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jse"
-version = "0.1.3"
+version = "0.1.4"
 description = "Quickly edit json files from the command line"
 authors = ["Brian Jubelirer <brian2386@gmail.com>"]
 readme = "README.md"
